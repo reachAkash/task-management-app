@@ -9,10 +9,8 @@ const {
   createProject,
   addUserToProject,
 } = require("../controllers/project.controllers.js");
-const {
-  createTask,
-  assignTasks,
-} = require("../controllers/task.controllers.js");
+const {} = require("../controllers/task.controllers.js");
+const { banUser, removeUser } = require("../controllers/admin.controllers.js");
 
 router.post("/create-user", AuthenticateRequest, isAdmin, createUser);
 router.post("/create-admin", createUser);
@@ -22,7 +20,7 @@ router.post(
   isManager,
   addUserToProject
 );
-router.post("/create-tasks", AuthenticateRequest, isManager, createTask);
-router.post("/assign-tasks", AuthenticateRequest, isManager, assignTasks);
 router.post("/create-project", AuthenticateRequest, isManager, createProject);
+router.post("/remove-user", AuthenticateRequest, isAdmin, removeUser);
+router.post("/ban-user", AuthenticateRequest, isAdmin, banUser);
 module.exports = router;

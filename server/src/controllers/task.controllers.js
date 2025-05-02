@@ -3,10 +3,13 @@ const { Task } = require("../models/task.models");
 const { User } = require("../models/user.models");
 const { use } = require("../routes/admin.routes");
 const { asyncHandler } = require("../utils/asyncHandler.utils");
-const { errorResponse } = require("../utils/responseHelper.utils");
+const {
+  errorResponse,
+  successResponse,
+} = require("../utils/responseHelper.utils");
 
 module.exports = {
-  createTask: asyncHandler(async (req, res) => {
+  createTask: asyncHandler(async (req, res, next) => {
     const { title, description, projectId } = req.body;
 
     if (!title || !description || !projectId) {
@@ -15,60 +18,127 @@ module.exports = {
         .json({ message: "Title, description, and projectId are required" });
     }
 
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ message: "Project not found" });
+    try {
+      const existingTask = await Task.findOne({ title, projectId });
+
+      if (existingTask) {
+        return errorResponse(res, 400, "Task already exists");
+      }
+
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      const task = await Task.create({
+        title,
+        description,
+        projectId,
+      });
+
+      project.tasks.push(task._id);
+      await project.save();
+
+      res.status(201).json({ message: "Task created successfully", task });
+    } catch (err) {
+      return next(err);
     }
-
-    const task = await Task.create({
-      title,
-      description,
-      projectId,
-    });
-
-    project.tasks.push(task._id);
-    await project.save();
-
-    res.status(201).json({ message: "Task created successfully", task });
   }),
 
-  assignTasks: asyncHandler(async (req, res) => {
-    try {
-      const { taskId, userId, projectId } = req.body;
+  assignTask: asyncHandler(async (req, res, next) => {
+    const { taskId, userId, projectId } = req.body;
 
-      // Check if the project exists
+    if (!taskId || !userId || !projectId) {
+      return errorResponse(
+        res,
+        400,
+        "Task ID, User ID, and Project ID are required"
+      );
+    }
+
+    try {
+      // Validate project
       const project = await Project.findById(projectId);
       if (!project) {
         return errorResponse(res, 404, "Project not found");
       }
-      const existingTask = await Task.findById(taskId);
-      if (!existingTask) {
+
+      // Validate task
+      const task = await Task.findById(taskId);
+      if (!task) {
         return errorResponse(res, 404, "Task not found");
       }
 
-      // Check if the user is part of the project
-      const isUserInProject = project.members.includes(userId); // Assuming project has a members field
-      if (!isUserInProject) {
+      // Check if user is a member of the project
+      if (!project.members.includes(userId)) {
         return errorResponse(res, 403, "User is not part of the project");
       }
 
-      // Assign the task
-      const task = await Task.findById(taskId);
-      if (!task) {
-        return res.status(404).json({ message: "Task not found" });
+      // Check if user is already assigned
+      if (task.assignedTo.includes(userId)) {
+        return errorResponse(res, 400, "User already assigned to this task");
       }
 
-      task.assignedTo = userId;
+      // Add user to task's assignedTo array
+      task.assignedTo.push(userId);
       await task.save();
+
+      // Add task to user's tasks array if not already there
       await User.findByIdAndUpdate(userId, {
-        $push: { tasks: task._id },
+        $addToSet: { tasks: task._id },
       });
 
-      return res
-        .status(200)
-        .json({ message: "Task assigned successfully", task });
+      return successResponse(res, 200, "Task assigned successfully", task);
     } catch (error) {
-      return res.status(500).json({ message: "Internal server error" });
+      console.log(error);
+      return next(error);
+    }
+  }),
+
+  updateTask: asyncHandler(async (req, res, next) => {
+    const { taskId } = req.params;
+    const { title, description, status } = req.body;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    if (!title && !description && !status) {
+      return errorResponse(res, 400, "No task fields provided to update.");
+    }
+
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) {
+        return errorResponse(res, 404, "Task not found.");
+      }
+
+      // Title or description update — only for manager or admin
+      if ((title || description) && !["manager", "admin"].includes(userRole)) {
+        return errorResponse(res, 403, "Unauthorized");
+      }
+
+      // Status update — allowed for manager, admin, or assigned users
+      const isAssigned = task.assignedTo.some(
+        (assignedUser) => assignedUser.toString() === userId
+      );
+
+      if (status && !["manager", "admin"].includes(userRole) && !isAssigned) {
+        return errorResponse(
+          res,
+          403,
+          "You are not authorized to update task status."
+        );
+      }
+
+      // Apply updates
+      if (title) task.title = title;
+      if (description) task.description = description;
+      if (status) task.status = status;
+
+      await task.save();
+
+      return successResponse(res, 200, "Task updated successfully.", task);
+    } catch (err) {
+      return next(err);
     }
   }),
 };
