@@ -31,7 +31,7 @@ module.exports = {
       next(error);
     }
   }),
-  registerUser: asyncHandler(async (req, res, next) => {
+  createUser: asyncHandler(async (req, res, next) => {
     try {
       const { name, email, password } = req.body;
 
@@ -132,5 +132,10 @@ module.exports = {
     } catch (err) {
       return next(err);
     }
+  }),
+  logoutUser: asyncHandler(async (req, res) => {
+    res.clearCookie("accessToken", { httpOnly: true, secure: true });
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+    successResponse(res, 200, "Logged out successfully");
   }),
 };

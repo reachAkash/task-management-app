@@ -10,11 +10,12 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the user assigned to the task
-      required: true,
-    },
+    assignedTo: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the users assigned to the task
+      },
+    ],
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project", // Reference to the project the task belongs to

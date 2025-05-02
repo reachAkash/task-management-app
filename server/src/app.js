@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const { errorHandler } = require("./middlewares/error.middlewares.js");
 const userRoutes = require("./routes/user.routes.js");
+const adminRoutes = require("./routes/admin.routes.js");
 
 // initial configurations
 app.use(morgan("combined"));
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // api routes
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // catching invalid routes
 app.use((req, res, next) => {

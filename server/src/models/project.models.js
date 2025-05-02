@@ -16,13 +16,13 @@ const projectSchema = new mongoose.Schema(
         ref: "Task", // Array of tasks related to this project
       },
     ],
-    users: [
+    members: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User", // Users assigned to this project
       },
     ],
-    manager: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Manager of the project (either admin or manager role)
       required: true,
