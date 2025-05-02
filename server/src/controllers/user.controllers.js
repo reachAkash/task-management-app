@@ -9,6 +9,26 @@ const { asyncHandler } = require("../utils/asyncHandler.utils");
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 module.exports = {
+  getUsers: asyncHandler(async (req, res, next) => {
+    try {
+      const users = await User.find({});
+      return successResponse(res, 200, "Users fetched successfully", users);
+    } catch (err) {
+      next(err);
+    }
+  }),
+  getSingleUser: asyncHandler(async (req, res, next) => {
+    try {
+      const { userId } = req.params;
+      const user = await User.findById(userId);
+      if (!user) {
+        return errorResponse(res, 404, "User not found");
+      }
+      return successResponse(res, 200, "User fetched successfully", user);
+    } catch (err) {
+      next(err);
+    }
+  }),
   loginUser: asyncHandler(async (req, res, next) => {
     try {
       const { email, password } = req.body;

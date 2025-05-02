@@ -1,9 +1,46 @@
 const { Project } = require("../models/project.models"); // Assume project model exists
+const { Task } = require("../models/task.models");
 const { User } = require("../models/user.models");
 const { asyncHandler } = require("../utils/asyncHandler.utils");
-const { errorResponse } = require("../utils/responseHelper.utils");
+const {
+  errorResponse,
+  successResponse,
+} = require("../utils/responseHelper.utils");
 
 module.exports = {
+  getProjects: asyncHandler(async (req, res, next) => {
+    try {
+      const projects = await Project.find()
+        .populate("members", "name email role") // optional: populate member details
+        .populate("tasks", "title status assignedTo"); // optional: populate basic task info
+
+      return successResponse(
+        res,
+        200,
+        "Projects fetched successfully.",
+        projects
+      );
+    } catch (err) {
+      next(err);
+    }
+  }),
+  getSingleProject: asyncHandler(async (req, res, next) => {
+    const { projectId } = req.params;
+    if (!projectId) {
+      return errorResponse(res, 404, "ProjectId not found");
+    }
+    try {
+      const project = await Project.findById(projectId);
+
+      if (!project) {
+        return errorResponse(res, 404, "Project not found");
+      }
+
+      return successResponse(res, 200, "Project fetched successfully", project);
+    } catch (err) {
+      next(err);
+    }
+  }),
   createProject: asyncHandler(async (req, res, next) => {
     try {
       const { projectName, description } = req.body;
@@ -33,9 +70,12 @@ module.exports = {
         $push: { projects: newProject._id }, // Add the project to the user's projects
       });
 
-      return res
-        .status(201)
-        .json({ message: "Project created successfully", project: newProject });
+      return successResponse(
+        res,
+        201,
+        "Project created successfully",
+        newProject
+      );
     } catch (error) {
       next(error);
     }
@@ -63,11 +103,80 @@ module.exports = {
       user.projects.push(project._id);
       await user.save();
 
-      return res
-        .status(200)
-        .json({ message: "User added to project successfully" });
+      return successResponse(res, 200, "User added to project successfully");
     } catch (error) {
       next(error);
+    }
+  }),
+
+  updateProject: asyncHandler(async (req, res, next) => {
+    const { projectId } = req.params;
+    const { name, description } = req.body;
+
+    if (!name && !description) {
+      return errorResponse(res, 400, "No project fields provided to update.");
+    }
+
+    try {
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return errorResponse(res, 404, "Project not found.");
+      }
+
+      if (name) project.name = name;
+      if (description) project.description = description;
+
+      await project.save();
+
+      return successResponse(
+        res,
+        200,
+        "Project updated successfully.",
+        project
+      );
+    } catch (err) {
+      next(err);
+    }
+  }),
+
+  deleteProject: asyncHandler(async (req, res, next) => {
+    const { projectId } = req.params;
+    try {
+      // Step 1: Find the project
+      const project = await Project.findById(projectId);
+      if (!project) {
+        return errorResponse(res, 404, "Project not found.");
+      }
+
+      // Step 2: Get all task IDs related to this project
+      const taskIds = await Task.find({ projectId }).distinct("_id");
+
+      // Step 3: Delete all tasks related to the project
+      await Task.deleteMany({ projectId });
+
+      // Step 4: Remove those task references from all users
+      await User.updateMany(
+        { tasks: { $in: taskIds } },
+        { $pull: { tasks: { $in: taskIds } } }
+      );
+
+      // Step 5: Remove this project from users' project lists
+      await User.updateMany(
+        { projects: projectId },
+        { $pull: { projects: projectId } }
+      );
+
+      // Step 6: Delete the project itself
+      await Project.findByIdAndDelete(projectId);
+      // task => 6814ba0d3cfcc5987d9620a1
+
+      return successResponse(
+        res,
+        200,
+        "Project and its tasks deleted successfully."
+      );
+    } catch (err) {
+      next(err);
     }
   }),
 };

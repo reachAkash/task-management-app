@@ -92,4 +92,26 @@ module.exports = {
       next(err);
     }
   }),
+
+  promoteUser: asyncHandler(async (req, res, next) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return errorResponse(res, 400, "User ID is required.");
+    }
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        return errorResponse(res, 404, "User not found");
+      }
+
+      user.role = "manager";
+      await user.save();
+
+      return successResponse(res, 200, "User promoted to manager");
+    } catch (err) {
+      next(err);
+    }
+  }),
 };

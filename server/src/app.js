@@ -7,6 +7,7 @@ const { errorHandler } = require("./middlewares/error.middlewares.js");
 const userRoutes = require("./routes/user.routes.js");
 const adminRoutes = require("./routes/admin.routes.js");
 const taskRoutes = require("./routes/task.routes.js");
+const projectRoutes = require("./routes/project.routes.js");
 
 // initial configurations
 app.use(morgan("combined"));
@@ -18,6 +19,7 @@ app.use(express.json());
 // api routes
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 
 // catching invalid routes

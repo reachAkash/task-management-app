@@ -9,6 +9,10 @@ const {
 } = require("../utils/responseHelper.utils");
 
 module.exports = {
+  getTasks: asyncHandler(async (req, res, next) => {
+    const tasks = await Task.find({});
+    return successResponse(res, 200, "Tasks fetched successfully", tasks);
+  }),
   createTask: asyncHandler(async (req, res, next) => {
     const { title, description, projectId } = req.body;
 
@@ -42,6 +46,22 @@ module.exports = {
       res.status(201).json({ message: "Task created successfully", task });
     } catch (err) {
       return next(err);
+    }
+  }),
+
+  getSingleTask: asyncHandler(async (req, res, next) => {
+    const { taskId } = req.params;
+    if (!taskId) {
+      return errorResponse(res, 404, "TaskId not found");
+    }
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) {
+        return errorResponse(res, 404, "Task not found");
+      }
+      return successResponse(res, 200, "Task fetched successfully", task);
+    } catch (err) {
+      next(err);
     }
   }),
 
@@ -139,6 +159,22 @@ module.exports = {
       return successResponse(res, 200, "Task updated successfully.", task);
     } catch (err) {
       return next(err);
+    }
+  }),
+  deleteTask: asyncHandler(async (req, res, next) => {
+    const { taskId } = req.params;
+    if (!taskId) {
+      return errorResponse(res, 404, "TaskId not found");
+    }
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) {
+        return errorResponse(res, 404, "Task not found");
+      }
+      await Task.findByIdAndDelete(taskId);
+      return successResponse(res, 200, "Task deleted successfully");
+    } catch (err) {
+      next(err);
     }
   }),
 };
