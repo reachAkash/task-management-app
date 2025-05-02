@@ -5,10 +5,11 @@ const {
   successResponse,
   errorResponse,
 } = require("../utils/responseHelper.utils");
+const { asyncHandler } = require("../utils/asyncHandler.utils");
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 module.exports = {
-  loginUser: async (req, res, next) => {
+  loginUser: asyncHandler(async (req, res, next) => {
     try {
       const { email, password } = req.body;
 
@@ -29,8 +30,8 @@ module.exports = {
     } catch (error) {
       next(error);
     }
-  },
-  registerUser: async (req, res, next) => {
+  }),
+  registerUser: asyncHandler(async (req, res, next) => {
     try {
       const { name, email, password } = req.body;
 
@@ -62,8 +63,8 @@ module.exports = {
     } catch (error) {
       next(error);
     }
-  },
-  verifyOtp: async (req, res, next) => {
+  }),
+  verifyOtp: asyncHandler(async (req, res, next) => {
     try {
       const { email, otp } = req.body;
 
@@ -101,8 +102,8 @@ module.exports = {
     } catch (error) {
       next(error);
     }
-  },
-  refreshToken: async (req, res) => {
+  }),
+  refreshToken: asyncHandler(async (req, res) => {
     const token = req.cookies.refreshToken;
     if (!token) return res.status(401).json({ message: "No refresh token" });
 
@@ -131,5 +132,5 @@ module.exports = {
     } catch (err) {
       return next(err);
     }
-  },
+  }),
 };
