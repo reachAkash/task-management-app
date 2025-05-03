@@ -1,6 +1,11 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  FilesIcon,
+  LucidePersonStanding,
+  type LucideIcon,
+} from "lucide-react";
 
 import {
   Collapsible,
@@ -17,26 +22,43 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { ProjectInterface } from "@/types/project.types";
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon?: LucideIcon;
-    isActive?: boolean;
-    items?: {
-      title: string;
-      url: string;
-    }[];
-  }[];
-}) {
+interface NavMainProps {
+  projects?: ProjectInterface[];
+}
+
+export function NavMain({ projects }: NavMainProps) {
+  const navMainData = [
+    {
+      title: "Projects",
+      url: "#",
+      isActive: true,
+      icon: FilesIcon,
+      items:
+        projects?.map((project) => ({
+          title: project.name,
+          url: `/projects/${project._id}`,
+        })) || [],
+    },
+    {
+      title: "Members",
+      url: "#",
+      icon: LucidePersonStanding,
+      items: [
+        { title: "General", url: "#" },
+        { title: "Team", url: "#" },
+        { title: "Billing", url: "#" },
+        { title: "Limits", url: "#" },
+      ],
+    },
+  ];
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {navMainData.map((item) => (
           <Collapsible
             key={item.title}
             asChild

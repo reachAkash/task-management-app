@@ -20,15 +20,23 @@ module.exports = {
   getSingleUser: asyncHandler(async (req, res, next) => {
     try {
       const { userId } = req.params;
-      const user = await User.findById(userId);
+
+      const user = await User.findById(userId)
+        .populate("projects") // populates ProjectInterface[]
+        .populate("tasks"); // populates TaskInterface[]
+
       if (!user) {
         return errorResponse(res, 404, "User not found");
       }
-      return successResponse(res, 200, "User fetched successfully", user);
+
+      const { password, refreshToken, otpExpiry, ...rest } = user._doc;
+
+      return successResponse(res, 200, "User fetched successfully", rest);
     } catch (err) {
       next(err);
     }
   }),
+
   loginUser: asyncHandler(async (req, res, next) => {
     try {
       const { email, password } = req.body;
@@ -88,21 +96,22 @@ module.exports = {
     try {
       const { email, otp } = req.body;
 
-      const user = await User.findOne({ email });
-
+      // const user = await User.findOne({ email })
+      const user = await User.findOne({ email })
+        .populate("projects") // populates ProjectInterface[]
+        .populate("tasks"); // populates TaskInterface[]
       if (!user || user.otp !== otp || user.otpExpiry < Date.now()) {
         return errorResponse(res, 400, "Invalid or expired OTP");
       }
 
-      user.isVerified = true;
-      user.otp = undefined;
-      user.otpExpiry = undefined;
-
-      await user.save();
-
       const accessToken = user.generateAccessToken();
       const refreshToken = user.generateRefreshToken();
 
+      user.isVerified = true;
+      user.otp = undefined;
+      user.otpExpiry = undefined;
+      user.refreshToken = refreshToken;
+      await user.save();
       res
         .cookie("accessToken", accessToken, {
           httpOnly: true,
@@ -117,7 +126,13 @@ module.exports = {
           maxAge: 604800000,
         });
 
-      const { password, ...rest } = user._doc;
+      const {
+        password,
+        otp: otpEx,
+        otpExpiry,
+        refreshToken: refreshTokenEx,
+        ...rest
+      } = user._doc;
       successResponse(res, 200, "User verified successfully", rest);
     } catch (error) {
       next(error);
@@ -130,7 +145,8 @@ module.exports = {
     try {
       const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
       const user = await User.findById(decoded.userId);
-
+      console.log(token);
+      console.log(user.refreshToken);
       if (!user || user.refreshToken !== token) {
         return errorResponse(res, 403, "Invalid refresh token");
       }

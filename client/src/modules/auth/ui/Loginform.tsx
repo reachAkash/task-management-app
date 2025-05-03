@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { InputOTPPattern } from "@/components/InputOTPPattern";
 import { useRouter } from "next/navigation";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
+import useUserStore from "@/states/store";
 
 interface LoginResponse {
   message: string;
@@ -35,6 +36,7 @@ export function LoginForm({
   const [otpInitialised, setOtpInitialised] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { setUser } = useUserStore();
 
   const loginUser = async () => {
     try {
@@ -66,7 +68,7 @@ export function LoginForm({
           otp,
         }
       );
-      console.log(data);
+      setUser(data.data);
       toast.success(data.message ?? "Success!");
       router.push("/");
     } catch (err: any) {

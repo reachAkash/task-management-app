@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { InputOTPPattern } from "@/components/InputOTPPattern";
 import { useRouter } from "next/navigation";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
+import useUserStore from "@/states/store";
 
 interface RegisterForm {
   message: string;
@@ -36,6 +37,7 @@ export function RegisterForm({
   const [otp, setOtp] = useState("");
   const [otpInitialised, setOtpInitialised] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { setUser } = useUserStore();
 
   const RegisterUser = async () => {
     try {
@@ -67,7 +69,7 @@ export function RegisterForm({
           otp,
         }
       );
-      console.log(data);
+      setUser(data.data);
       toast.success(data.message ?? "Success!");
       router.push("/");
     } catch (err: any) {
