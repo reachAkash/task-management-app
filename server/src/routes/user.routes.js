@@ -7,6 +7,7 @@ const {
   logoutUser,
   getUsers,
   getSingleUser,
+  createUser,
 } = require("../controllers/user.controllers.js");
 const {
   AuthenticateRequest,
@@ -14,6 +15,7 @@ const {
 
 router.get("/", AuthenticateRequest, getUsers);
 router.get("/:userId", AuthenticateRequest, getSingleUser);
+router.post("/create-user", createUser);
 router.post("/login", loginUser);
 router.post("/verify-otp", verifyOtp);
 router.post("/refresh-token", refreshToken);

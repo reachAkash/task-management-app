@@ -1,6 +1,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { LoginForm } from "../ui/Loginform";
+import Image from "next/image";
 
 export function LoginLayout() {
   return (
@@ -11,7 +12,7 @@ export function LoginLayout() {
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            Acme Inc.
+            Taskify Inc.
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
@@ -21,7 +22,8 @@ export function LoginLayout() {
         </div>
       </div>
       <div className="relative hidden bg-muted lg:block">
-        <img
+        <Image
+          fill
           src="/logoXL.png"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
