@@ -11,7 +11,7 @@ const projectRoutes = require("./routes/project.routes.js");
 
 // initial configurations
 app.use(morgan("combined"));
-app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
