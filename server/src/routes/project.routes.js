@@ -18,6 +18,11 @@ router.get("/:projectId", AuthenticateRequest, getSingleProject);
 router.post("/add-user", AuthenticateRequest, isManager, addUserToProject);
 router.post("/create", AuthenticateRequest, isManager, createProject);
 router.put("/update/:projectId", AuthenticateRequest, isManager, updateProject);
-router.delete("/:projectId", AuthenticateRequest, isManager, deleteProject);
+router.delete(
+  "/delete/:projectId",
+  AuthenticateRequest,
+  isManager,
+  deleteProject
+);
 
 module.exports = router;

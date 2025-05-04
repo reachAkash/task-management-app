@@ -14,7 +14,8 @@ const {
 } = require("../middlewares/authenticate.middlewares.js");
 
 router.get("/", AuthenticateRequest, getUsers);
-router.get("/:userId", AuthenticateRequest, getSingleUser);
+// router.get("/:userId", AuthenticateRequest, getSingleUser);
+router.get("/get-user", AuthenticateRequest, getSingleUser);
 router.post("/create-user", createUser);
 router.post("/login", loginUser);
 router.post("/verify-otp", verifyOtp);

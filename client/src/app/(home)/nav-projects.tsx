@@ -24,24 +24,28 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { sectors } from "@/utils/constants";
+import { ResponsiveModal } from "@/components/ResponsiveModal";
+import { useState } from "react";
 
-export function NavProjects({
-  projects,
-}: {
-  projects: {
-    name: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-}) {
+export function NavProjects() {
   const { isMobile } = useSidebar();
+  const [open, setOpen] = useState(false);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <ResponsiveModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        title="Warning!"
+        // description="This is a reusable modal using shadcn."
+      >
+        <p>Feature is under development.</p>
+      </ResponsiveModal>
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+        {sectors?.map((item) => (
+          <SidebarMenuItem onClick={() => setOpen(true)} key={item.name}>
             <SidebarMenuButton asChild>
               <a href={item.url}>
                 <item.icon />

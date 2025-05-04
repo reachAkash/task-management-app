@@ -19,11 +19,16 @@ module.exports = {
   }),
   getSingleUser: asyncHandler(async (req, res, next) => {
     try {
-      const { userId } = req.params;
-
-      const user = await User.findById(userId)
-        .populate("projects") // populates ProjectInterface[]
-        .populate("tasks"); // populates TaskInterface[]
+      const user = await User.findById(req.user._id)
+        .populate({
+          path: "projects",
+          populate: {
+            path: "createdBy",
+            model: "User",
+            select: "-password -refreshToken -otpExpiry -__v", // exclude sensitive fields
+          },
+        })
+        .populate("tasks"); // assuming tasks doesn't need further population
 
       if (!user) {
         return errorResponse(res, 404, "User not found");

@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { InputOTPPattern } from "@/components/InputOTPPattern";
 import { useRouter } from "next/navigation";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
-import useUserStore from "@/states/store";
 
 interface LoginResponse {
   message: string;
@@ -30,13 +29,14 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const router = useRouter();
-  const [email, setEmail] = useState("akashgupta9062@gmail.com");
-  const [password, setPassword] = useState("usingTaskify");
+  const [email, setEmail] = useState(process.env.NEXT_PUBLIC_LOGIN_DUMMY_EMAIL);
+  const [password, setPassword] = useState(
+    process.env.NEXT_PUBLIC_LOGIN_DUMMY_PASS
+  );
   const [otp, setOtp] = useState("");
   const [otpInitialised, setOtpInitialised] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const { setUser } = useUserStore();
 
   const loginUser = async () => {
     try {
@@ -68,7 +68,6 @@ export function LoginForm({
           otp,
         }
       );
-      setUser(data.data);
       toast.success(data.message ?? "Success!");
       router.push("/");
     } catch (err: any) {

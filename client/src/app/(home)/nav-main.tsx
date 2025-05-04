@@ -22,7 +22,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { ProjectInterface } from "@/types/project.types";
+import { ProjectInterface } from "@/utils/types";
 
 interface NavMainProps {
   projects?: ProjectInterface[];
@@ -37,8 +37,8 @@ export function NavMain({ projects }: NavMainProps) {
       icon: FilesIcon,
       items:
         projects?.map((project) => ({
-          title: project.name,
-          url: `/projects/${project._id}`,
+          title: project?.name,
+          url: `/projects/${project?._id}`,
         })) || [],
     },
     {
@@ -56,7 +56,7 @@ export function NavMain({ projects }: NavMainProps) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
       <SidebarMenu>
         {navMainData.map((item) => (
           <Collapsible
@@ -76,7 +76,9 @@ export function NavMain({ projects }: NavMainProps) {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubItem
+                      key={subItem?.title || JSON.stringify(new Date())}
+                    >
                       <SidebarMenuSubButton asChild>
                         <a href={subItem.url}>
                           <span>{subItem.title}</span>

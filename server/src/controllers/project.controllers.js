@@ -60,8 +60,8 @@ module.exports = {
       }
 
       const newProject = await Project.create({
-        name: projectName,
-        description,
+        name: projectName.trim(),
+        description: description.trim(),
         members: [req.user._id], // Add the creator as the first member
         createdBy: req.user._id, // Track who created the project
       });
