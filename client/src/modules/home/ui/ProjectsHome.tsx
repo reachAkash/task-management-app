@@ -40,10 +40,6 @@ export const ProjectsHome = () => {
     }
   };
 
-  const getProjectOwner = () => {};
-
-  useEffect(() => {});
-
   return (
     <div className="w-full flex flex-col space-y-4">
       <div className="text-sm text-muted-foreground">Projects</div>
@@ -76,7 +72,10 @@ export const ProjectsHome = () => {
             </CardHeader>
 
             <CardContent className="space-y-4">
-              <CardDescription>{item?.description}</CardDescription>
+              <CardDescription>
+                {item?.description?.split(" ").slice(0, 10).join(" ")}
+                {item?.description?.split(" ").length > 10 && " ..."}
+              </CardDescription>
               <CardFooter>
                 <div className="w-full text-sm text-shadow-muted-foreground flex items-center justify-end gap-2">
                   <Avatar className="h-5 w-5 rounded-full">

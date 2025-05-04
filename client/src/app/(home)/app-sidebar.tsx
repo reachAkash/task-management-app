@@ -63,6 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   React.useEffect(() => {
     getUserData();
   }, []);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

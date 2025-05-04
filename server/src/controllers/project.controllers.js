@@ -30,7 +30,7 @@ module.exports = {
       return errorResponse(res, 404, "ProjectId not found");
     }
     try {
-      const project = await Project.findById(projectId);
+      const project = await Project.findById(projectId).populate("tasks");
 
       if (!project) {
         return errorResponse(res, 404, "Project not found");
