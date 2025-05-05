@@ -11,3 +11,7 @@ export const inviteToProjectRoute = "/projects/add-user";
 export const deleteProjectRoute = "/projects/delete";
 export const createProjectRoute = "/projects/create";
 export const createTaskRoute = "/tasks/create-task";
+export const deleteTaskRoute = "/tasks/delete";
+export const updateTaskRoute = "/tasks/update";
+export const assignTaskRoute = "/tasks/assign-task";
+export const getTasksRoute = "/tasks";

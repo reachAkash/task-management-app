@@ -9,7 +9,13 @@ const {
 
 module.exports = {
   getTasks: asyncHandler(async (req, res, next) => {
-    const tasks = await Task.find({});
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      return errorResponse(res, 400, "projectId is required");
+    }
+
+    const tasks = await Task.find({ projectId }).populate("assignedTo");
     return successResponse(res, 200, "Tasks fetched successfully", tasks);
   }),
 
@@ -109,39 +115,44 @@ module.exports = {
       return errorResponse(res, 404, "Task not found.");
     }
 
-    // Title or description update — only for manager or admin
-    if ((title || description) && !["manager", "admin"].includes(userRole)) {
-      return errorResponse(
+    const isAssignedUser = task.assignedTo?.toString() === userId;
+    const isManagerOrAdmin = ["manager", "admin"].includes(userRole);
+
+    // If user is neither admin nor manager
+    if (!isManagerOrAdmin) {
+      // Users can ONLY update status — and only if they are assigned
+      if (!status || !isAssignedUser) {
+        return errorResponse(
+          res,
+          403,
+          "You are only allowed to update status of your assigned tasks."
+        );
+      }
+
+      // Only allow status update
+      task.status = status;
+      await task.save();
+      return successResponse(
         res,
-        403,
-        "Unauthorized to update title/description."
+        200,
+        "Task status updated successfully.",
+        task
       );
     }
 
-    // Status update — allowed for manager, admin, or assigned users
-    const isAssigned = task.assignedTo && task.assignedTo.toString() === userId;
-
-    if (status && !["manager", "admin"].includes(userRole) && !isAssigned) {
-      return errorResponse(
-        res,
-        403,
-        "You are not authorized to update task status."
-      );
-    }
-
-    // Apply updates
+    // Manager/Admin logic: allow all updates
     if (title) task.title = title;
     if (description) task.description = description;
     if (status) task.status = status;
     if (priority) task.priority = priority;
 
     await task.save();
-
     return successResponse(res, 200, "Task updated successfully.", task);
   }),
 
   deleteTask: asyncHandler(async (req, res, next) => {
     const { taskId } = req.params;
+
     if (!taskId) {
       return errorResponse(res, 404, "TaskId not found");
     }
@@ -151,6 +162,21 @@ module.exports = {
       return errorResponse(res, 404, "Task not found");
     }
 
+    // Remove task ID from assigned user's task list
+    if (task.assignedTo) {
+      await User.findByIdAndUpdate(task.assignedTo, {
+        $pull: { tasks: task._id },
+      });
+    }
+
+    // Remove task ID from project's task list
+    if (task.projectId) {
+      await Project.findByIdAndUpdate(task.projectId, {
+        $pull: { tasks: task._id },
+      });
+    }
+
+    // Delete the task
     await Task.findByIdAndDelete(taskId);
 
     return successResponse(res, 200, "Task deleted successfully");

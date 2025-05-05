@@ -2,6 +2,7 @@
 
 import {
   ChevronRight,
+  CrownIcon,
   FilesIcon,
   LucidePersonStanding,
   type LucideIcon,
@@ -25,6 +26,8 @@ import {
 } from "@/components/ui/sidebar";
 import { v4 as uuidv4 } from "uuid";
 import { ProjectInterface, UserInterface } from "@/utils/types";
+import { useUserStore } from "@/states/store";
+import { cn } from "@/lib/utils";
 
 interface NavMainProps {
   projects?: ProjectInterface[];
@@ -33,13 +36,14 @@ interface NavMainProps {
 
 interface NavItem {
   title: string;
-  url: string;
+  url?: string;
   icon?: LucideIcon;
   isActive?: boolean;
-  items?: { title: string; url: string }[];
+  items?: { title: string; url?: string; role?: string; id?: string }[];
 }
 
 export function NavMain({ projects = [], users = [] }: NavMainProps) {
+  const { user } = useUserStore();
   const navMainData: NavItem[] = [
     {
       title: "Projects",
@@ -53,11 +57,11 @@ export function NavMain({ projects = [], users = [] }: NavMainProps) {
     },
     {
       title: "Members",
-      url: "#",
       icon: LucidePersonStanding,
       items: users.map((user) => ({
         title: user?.name,
-        url: "#", // Replace with actual member URL if needed
+        role: user?.role,
+        id: user?._id,
       })),
     },
   ];
@@ -88,9 +92,31 @@ export function NavMain({ projects = [], users = [] }: NavMainProps) {
                     {item?.items?.map((subItem) => (
                       <SidebarMenuSubItem key={uuidv4()}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem?.url}>
-                            <span>{subItem?.title}</span>
-                          </a>
+                          {subItem.url ? (
+                            <a href={subItem?.url}>
+                              <span>{subItem?.title}</span>
+                            </a>
+                          ) : (
+                            <div
+                              className={cn(
+                                `${
+                                  subItem.role === "admin"
+                                    ? "bg-amber-400 text-white hover:bg-amber-400"
+                                    : ""
+                                }flex items-center`
+                              )}
+                            >
+                              {"role" in user && subItem.role === "admin" && (
+                                <span>
+                                  <CrownIcon className="size-4 text-white" />
+                                </span>
+                              )}
+                              <span>{subItem?.title}</span>
+                              {"_id" in user && subItem.id == user._id && (
+                                <span className="text-[9px]">(You)</span>
+                              )}
+                            </div>
+                          )}
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

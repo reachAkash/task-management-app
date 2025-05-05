@@ -26,7 +26,7 @@ import {
   Users,
 } from "lucide-react";
 import { TasksSection } from "@/modules/project/ui/TasksSection";
-import { useMemberStore } from "@/states/store";
+import { useMemberStore, useTaskStore } from "@/states/store";
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -36,13 +36,15 @@ const ProjectPage = () => {
   const [project, setProject] = useState<ProjectInterface | null>(null);
   const { members, setMembers } = useMemberStore();
   const [loading, setLoading] = useState(true);
+  const { tasks, setTasks } = useTaskStore();
 
   const getProjectDetails = async () => {
     try {
       const res = await axiosInstance.get(`${getOneProjectRoute}/${projectId}`);
       setMembers(res?.data?.data?.members);
-      setProject(res.data.data);
-      console.log(res.data.data);
+      setProject(res?.data?.data);
+      setTasks(res?.data?.data?.tasks);
+      console.log(res.data);
     } catch (error) {
       console.error("Error fetching project:", error);
       setProject(null);
@@ -56,7 +58,6 @@ const ProjectPage = () => {
       const response = await axiosInstance.delete(
         `${deleteProjectRoute}/${projectId}`
       );
-      console.log(response.data);
       router.push("/");
       toast.success(response.data.message || "Project deleted successfully");
     } catch (error: any) {
@@ -180,7 +181,7 @@ const ProjectPage = () => {
             </div>
           </div>
         </div>
-        <TasksSection tasks={project.tasks} />
+        <TasksSection tasks={tasks} />
       </main>
     </div>
   );

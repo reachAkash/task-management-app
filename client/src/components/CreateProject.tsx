@@ -35,8 +35,7 @@ const CreateProject = ({ onClose }: CreateProjectProps) => {
         description,
       });
       toast.success(data.data.message || "Project created!");
-      const newProjects = [...projects, data.data.project];
-      setProjects(newProjects);
+      setProjects([...projects, data.data.data]);
       setProjectName("");
       setDescription("");
       onClose();

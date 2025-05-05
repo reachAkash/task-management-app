@@ -9,21 +9,21 @@ export const useUsers = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { setMembers } = useMemberStore();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const { data } = await axiosInstance.get(getUsersDataRoute);
-        const usersData = data?.data;
-        setUsers(usersData);
-        setMembers(usersData);
-      } catch (err: any) {
-        console.error("Other error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axiosInstance.get(getUsersDataRoute);
+      const usersData = data?.data;
+      setUsers(usersData);
+      setMembers(usersData);
+    } catch (err: any) {
+      console.error("Other error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchUsers();
   }, []);
 

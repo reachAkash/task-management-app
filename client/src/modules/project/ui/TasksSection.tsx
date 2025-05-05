@@ -1,14 +1,19 @@
 import { TaskInterface } from "@/utils/types";
 import { TaskCard } from "./TaskCard";
+import { useUserStore } from "@/states/store";
 
 interface TasksSectionProps {
   tasks: TaskInterface[];
 }
 
 export const TasksSection = ({ tasks }: TasksSectionProps) => {
+  const { user } = useUserStore();
+
   return (
     <div className="w-full flex flex-col space-y-4">
-      <div className="text-sm text-muted-foreground">Tasks</div>
+      <div className="text-sm text-muted-foreground">
+      { 'role' in user && user.role === 'admin' ? "All Tasks" : "My Tasks" }
+      </div>
       {tasks.length === 0 && (
         <div className="w-full h-[50vh] flex items-center justify-center text-sm text-muted-foreground">
           No Tasks...

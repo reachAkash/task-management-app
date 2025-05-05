@@ -17,12 +17,15 @@ import CreateProject from "@/components/CreateProject";
 import CreateTask from "@/components/CreateTask";
 import { ProjectsHome } from "@/modules/home/ui/ProjectsHome";
 import InviteTeam from "@/components/InviteTeam";
+import AssignTask from "@/components/AssignTask";
+import { useTaskStore } from "@/states/store";
 
 const page = () => {
   const [open, setOpen] = useState(false);
   const [modalType, setModalType] = useState<
-    "project" | "task" | "team" | null
+    "project" | "task" | "team" | "coming soon" | null
   >(null);
+  const { tasks } = useTaskStore();
 
   return (
     <SidebarInset>
@@ -34,7 +37,9 @@ const page = () => {
             ? "Create Project"
             : modalType === "task"
             ? "Create Task"
-            : "Invite Team"
+            : modalType === "team"
+            ? "Invite Team"
+            : "coming soon"
         }
       >
         {modalType === "project" && (
@@ -42,6 +47,7 @@ const page = () => {
         )}
         {modalType === "task" && <CreateTask onClose={() => setOpen(false)} />}
         {modalType === "team" && <InviteTeam onClose={() => setOpen(false)} />}
+        {modalType === "coming soon" && <p>Dummy modal here!</p>}
       </ResponsiveModal>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
@@ -113,7 +119,7 @@ const page = () => {
           </div>
           <div
             onClick={() => {
-              setModalType("team");
+              setModalType("coming soon");
               setOpen(true);
             }}
             className="flex px-6 py-4 items-center gap-x-4 border cursor-pointer hover:bg-gray-50/60 transition-all ease-in-out duration-300 rounded-lg shadow-sm"
@@ -124,7 +130,7 @@ const page = () => {
             <div>
               <div className="font-semibold">Dummy Data</div>
               <div className="text-sm text-muted-foreground">
-                Invite team to your project
+                Dummy text here!
               </div>
             </div>
           </div>

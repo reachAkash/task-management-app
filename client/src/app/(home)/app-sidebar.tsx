@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { axiosInstance } from "@/axios/axiosInstance";
 import { getSingleUserRoute, refreshTokenRoute } from "@/axios/apiRoutes";
-import { useProjectStore, useUserStore } from "@/states/store";
+import { useProjectStore, useTaskStore, useUserStore } from "@/states/store";
 import { ProjectInterface } from "@/utils/types";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -45,6 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       const { data } = await axiosInstance.get(`${getSingleUserRoute}/`);
       const userData = data?.data;
       setUser(userData);
+      console.log(userData);
       setProjects(userData?.projects || []);
     } catch (err: any) {
       if (err.response?.status === 401) {

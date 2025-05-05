@@ -27,13 +27,13 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard = ({ item }: ProjectCardProps) => {
-  const { projects, setProjects } = useProjectStore();
+  const { projects, setProjects, removeProject } = useProjectStore();
 
   const handleDelete = async (id: string) => {
     try {
       const data = await axiosInstance.delete(`${deleteProjectRoute}/${id}`);
       toast.success(data.data.message);
-      setProjects(projects.filter((project) => project._id !== id));
+      removeProject(id);
     } catch (err: any) {
       console.error(err);
       toast.error(

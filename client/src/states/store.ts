@@ -1,36 +1,68 @@
-// store.ts
-import { ProjectInterface, UserInterface } from "@/utils/types";
+import { getTasksRoute } from "@/axios/apiRoutes";
+import { axiosInstance } from "@/axios/axiosInstance";
+import { ProjectInterface, TaskInterface, UserInterface } from "@/utils/types";
 import { create } from "zustand";
 
-// Define the type for the state and actions
+// ---------------------- USER STORE ----------------------
 interface UserStore {
-  user: any;
-  setUser: (newUser: any) => void;
+  user: UserInterface | {};
+  setUser: (newUser: UserInterface) => void;
 }
-
-interface ProjectStore {
-  projects: ProjectInterface[] | [];
-  setProjects: (newProject: any) => void;
-}
-
-interface MemberStore {
-  members: any;
-  setMembers: (newMembers: any) => void;
-}
-
-// Create the store using Zustand's create function
 
 export const useUserStore = create<UserStore>((set) => ({
   user: {},
-  setUser: (newUser) => set({ user: newUser }), // Function to update the state
+  setUser: (newUser) => set({ user: newUser }),
 }));
+
+// ---------------------- PROJECT STORE ----------------------
+interface ProjectStore {
+  projects: ProjectInterface[];
+  setProjects: (newProjects: ProjectInterface[]) => void;
+  removeProject: (id: string) => void;
+}
 
 export const useProjectStore = create<ProjectStore>((set) => ({
   projects: [],
-  setProjects: (newProject) => set({ projects: newProject }), // Function to update the state
+  setProjects: (newProjects) => set({ projects: newProjects }),
+  removeProject: (id) =>
+    set((state) => ({
+      projects: state.projects.filter((project) => project._id !== id),
+    })),
 }));
 
+// ---------------------- TASK STORE ----------------------
+interface TaskStore {
+  tasks: TaskInterface[];
+  setTasks: (newTasks: TaskInterface[]) => void;
+  removeTask: (id: string) => void;
+  fetchAllTasks: (projectId:string) => Promise<void>;
+}
+
+export const useTaskStore = create<TaskStore>((set) => ({
+  tasks: [],
+  setTasks: (newTasks) => set({ tasks: newTasks }),
+  removeTask: (id) =>
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task._id !== id),
+    })),
+    fetchAllTasks: async (projectId: string) => {
+      try {
+        const res = await axiosInstance.get(`${getTasksRoute}/${projectId}`);
+        console.log(res.data);
+        set({ tasks: res.data.data });
+      } catch (err) {
+        console.error("Failed to fetch tasks", err);
+      }
+    },
+}));
+
+// ---------------------- MEMBER STORE ----------------------
+interface MemberStore {
+  members: UserInterface[]; // better to type this
+  setMembers: (newMembers: UserInterface[]) => void;
+}
+
 export const useMemberStore = create<MemberStore>((set) => ({
-  members: {},
-  setMembers: (newMembers) => set({ members: newMembers }), // Function to update the state
+  members: [],
+  setMembers: (newMembers) => set({ members: newMembers }),
 }));

@@ -12,10 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ellipsis, Paperclip, MessageSquare, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { axiosInstance } from "@/axios/axiosInstance";
-import { deleteProjectRoute } from "@/axios/apiRoutes";
+import {
+  assignTaskRoute,
+  deleteTaskRoute,
+  updateTaskRoute,
+} from "@/axios/apiRoutes";
 import { TaskInterface, UserInterface } from "@/utils/types";
-import { useMemberStore, useUserStore } from "@/states/store";
-import { use } from "react";
+import { useMemberStore, useTaskStore, useUserStore } from "@/states/store";
 
 const statusColors: Record<string, string> = {
   "not started": "bg-gray-300 text-gray-800",
@@ -28,17 +31,22 @@ const priorityColor: Record<string, string> = {
   low: "bg-amber-300 text-white",
 };
 
-const statusOptions = ["not started", "progress", "completed"];
+const statusOptions = ["Not started", "In progress", "Completed"];
+const priorityOptions = ["High", "Low"];
 
 export const TaskCard = ({ item }: { item: TaskInterface }) => {
   const { user } = useUserStore();
   const { members } = useMemberStore();
-  console.log(members);
-  console.log(user);
+  const { tasks, removeTask } = useTaskStore();
+  const fetchAllTasks = useTaskStore((state) => state.fetchAllTasks);
+
+  console.log(tasks);
+
   const handleDelete = async (id: string) => {
     try {
-      const data = await axiosInstance.delete(`${deleteProjectRoute}/${id}`);
+      const data = await axiosInstance.delete(`${deleteTaskRoute}/${id}`);
       toast.success(data.data.message);
+      removeTask(id);
     } catch (err: any) {
       toast.error(
         err.response?.data?.message || "Something went wrong. Please try again."
@@ -46,14 +54,39 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
     }
   };
 
-  const handleAssign = (name: string) => {
-    toast.success(`Task assigned to ${name}`);
-  };
-  const handleStatusChange = (status: string) => {
-    toast.success(`Status changed to "${status}"`);
+  const handleAssign = async (userId: string) => {
+    try {
+      const res = await axiosInstance.post(assignTaskRoute, {
+        taskId: item._id,
+        userId,
+        projectId: item.projectId, // Ensure item contains `projectId`
+      });
+      console.log(res.data.data);
+      await fetchAllTasks(item.projectId);
+      toast.success(res.data.message || "Task assigned successfully");
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || "Failed to assign task. Try again."
+      );
+    }
   };
 
-  console.log(item);
+  const handleTaskUpdate = async (
+    field: "status" | "priority",
+    value: string
+  ) => {
+    try {
+      const data = await axiosInstance.put(`${updateTaskRoute}/${item._id}`, {
+        [field]: value.toLowerCase(),
+      });
+      toast.success(data.data.message);
+      await fetchAllTasks(item.projectId);
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.message || "Something went wrong. Please try again."
+      );
+    }
+  };
 
   return (
     <Card className="p-4 bg-white border rounded-xl shadow-sm space-y-3">
@@ -66,7 +99,6 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
               "bg-gray-200 text-gray-700"
             }`}
           >
-            {" "}
             <AlertCircle className="w-3.5 h-3.5" />
             {item?.priority}
           </div>
@@ -89,7 +121,7 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
             <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            {user.role === "admin" && (
+            {"role" in user && user.role === "admin" && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-40">
@@ -104,6 +136,8 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
             )}
+
+            {/* Modify Status */}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Modify Status</DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="w-40">
@@ -115,7 +149,7 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
                   .map((status) => (
                     <DropdownMenuItem
                       key={status}
-                      onClick={() => handleStatusChange(status)}
+                      onClick={() => handleTaskUpdate("status", status)}
                     >
                       {status}
                     </DropdownMenuItem>
@@ -123,7 +157,29 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
               </DropdownMenuSubContent>
             </DropdownMenuSub>
 
-            {user.role === "admin" && (
+            {/* Modify Priority */}
+            {"role" in user && user.role === "admin" && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Modify Priority</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="w-40">
+                  {priorityOptions
+                    .filter(
+                      (priority) =>
+                        priority.toLowerCase() !== item.priority?.toLowerCase()
+                    )
+                    .map((priority) => (
+                      <DropdownMenuItem
+                        key={priority}
+                        onClick={() => handleTaskUpdate("priority", priority)}
+                      >
+                        {priority}
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
+
+            {"role" in user && user.role === "admin" && (
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
@@ -150,12 +206,12 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
       {/* Footer Section */}
       <div className="flex items-center justify-between mt-2">
         {/* Avatar Group */}
-        <div className="flex -space-x-2">
+        <div className="flex space-x-2">
           <Avatar className="w-6 h-6 border-2 border-white">
             <AvatarImage src="/userLogo.jpeg" alt="User" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
-          <div>{JSON.stringify(item.assignedTo)}</div>
+          <div>{item?.assignedTo?.name}</div>
         </div>
 
         {/* Icons Section */}

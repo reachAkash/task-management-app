@@ -36,10 +36,17 @@ module.exports = {
           populate: {
             path: "assignedTo",
             model: "User",
+            select: "-otp -otpExpire -refreshToken -password",
           },
         })
-        .populate("members")
-        .populate("createdBy");
+        .populate({
+          path: "members",
+          select: "-otp -otpExpire -refreshToken -password",
+        })
+        .populate({
+          path: "createdBy",
+          select: "-otp -otpExpire -refreshToken -password",
+        });
 
       if (!project) {
         return errorResponse(res, 404, "Project not found");
