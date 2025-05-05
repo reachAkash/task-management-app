@@ -1,0 +1,17 @@
+export const loginRoute = "/users/login";
+export const otpRoute = "/users/verify-otp";
+export const registerRoute = "/users/create-user";
+export const getUsersDataRoute = "/users";
+export const getSingleUserRoute = "/users/get-user";
+export const refreshTokenRoute = "/users/refresh-token";
+export const logoutUserRoute = "/users/logout";
+export const getProjectsRoute = "/projects";
+export const getOneProjectRoute = "/projects";
+export const inviteToProjectRoute = "/projects/add-user";
+export const deleteProjectRoute = "/projects/delete";
+export const createProjectRoute = "/projects/create";
+export const createTaskRoute = "/tasks/create-task";
+export const deleteTaskRoute = "/tasks/delete";
+export const updateTaskRoute = "/tasks/update";
+export const assignTaskRoute = "/tasks/assign-task";
+export const getTasksRoute = "/tasks";
