@@ -30,7 +30,16 @@ module.exports = {
       return errorResponse(res, 404, "ProjectId not found");
     }
     try {
-      const project = await Project.findById(projectId).populate("tasks");
+      const project = await Project.findById(projectId)
+        .populate({
+          path: "tasks",
+          populate: {
+            path: "assignedTo",
+            model: "User",
+          },
+        })
+        .populate("members")
+        .populate("createdBy");
 
       if (!project) {
         return errorResponse(res, 404, "Project not found");

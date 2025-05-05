@@ -19,12 +19,14 @@ import { useProjectStore, useUserStore } from "@/states/store";
 import { ProjectInterface } from "@/utils/types";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useUsers } from "@/hooks/useUsers";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
-  const [loading, setLoading] = React.useState(false);
+  const { users, loading } = useUsers();
   const { user, setUser } = useUserStore();
   const { projects, setProjects } = useProjectStore();
+
   const refreshToken = async () => {
     try {
       const data = await axiosInstance.post(refreshTokenRoute);
@@ -39,13 +41,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const getUserData = async () => {
-    console.log("inside 1st func");
-    setLoading(true);
     try {
       const { data } = await axiosInstance.get(`${getSingleUserRoute}/`);
       const userData = data?.data;
-
-      console.log(userData);
       setUser(userData);
       setProjects(userData?.projects || []);
     } catch (err: any) {
@@ -56,7 +54,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         console.error("Other error:", err);
       }
     } finally {
-      setLoading(false);
     }
   };
 
@@ -70,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain projects={projects} />
+        <NavMain projects={projects} users={users} />
         <NavProjects />
       </SidebarContent>
       <SidebarFooter>

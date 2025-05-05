@@ -150,8 +150,6 @@ module.exports = {
     try {
       const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
       const user = await User.findById(decoded.userId);
-      console.log(token);
-      console.log(user.refreshToken);
       if (!user || user.refreshToken !== token) {
         return errorResponse(res, 403, "Invalid refresh token");
       }

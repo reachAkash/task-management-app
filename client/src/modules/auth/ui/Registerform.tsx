@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { InputOTPPattern } from "@/components/InputOTPPattern";
 import { useRouter } from "next/navigation";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
-import useUserStore from "@/states/store";
+import { useUserStore } from "@/states/store";
 
 interface RegisterForm {
   message: string;
@@ -46,7 +46,6 @@ export function RegisterForm({
         registerRoute,
         { name, email, password }
       );
-      console.log(data);
       toast.success(data?.message ?? "Success!");
       setOtpInitialised(true);
     } catch (err: any) {

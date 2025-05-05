@@ -13,6 +13,11 @@ interface ProjectStore {
   setProjects: (newProject: any) => void;
 }
 
+interface MemberStore {
+  members: any;
+  setMembers: (newMembers: any) => void;
+}
+
 // Create the store using Zustand's create function
 
 export const useUserStore = create<UserStore>((set) => ({
@@ -23,4 +28,9 @@ export const useUserStore = create<UserStore>((set) => ({
 export const useProjectStore = create<ProjectStore>((set) => ({
   projects: [],
   setProjects: (newProject) => set({ projects: newProject }), // Function to update the state
+}));
+
+export const useMemberStore = create<MemberStore>((set) => ({
+  members: {},
+  setMembers: (newMembers) => set({ members: newMembers }), // Function to update the state
 }));

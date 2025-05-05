@@ -25,7 +25,7 @@ export function InputOTPPattern({ value, onChange }: InputOTPPatternProps) {
       pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
     >
       <InputOTPGroup>
-        <InputOTPSlot index={0} />
+        <InputOTPSlot autoFocus index={0} />
         <InputOTPSlot index={1} />
       </InputOTPGroup>
       <InputOTPSeparator />

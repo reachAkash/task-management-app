@@ -47,7 +47,6 @@ export function NavUser({
   const handleLogout = async () => {
     try {
       const data = await axiosInstance.get(logoutUserRoute);
-      console.log(data);
       toast.success(data?.data?.message);
       router.push("/login");
     } catch (err) {

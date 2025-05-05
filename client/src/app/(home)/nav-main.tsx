@@ -12,6 +12,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,35 +23,42 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { ProjectInterface } from "@/utils/types";
+import { v4 as uuidv4 } from "uuid";
+import { ProjectInterface, UserInterface } from "@/utils/types";
 
 interface NavMainProps {
   projects?: ProjectInterface[];
+  users?: UserInterface[];
 }
 
-export function NavMain({ projects }: NavMainProps) {
-  const navMainData = [
+interface NavItem {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  isActive?: boolean;
+  items?: { title: string; url: string }[];
+}
+
+export function NavMain({ projects = [], users = [] }: NavMainProps) {
+  const navMainData: NavItem[] = [
     {
       title: "Projects",
       url: "#",
       isActive: true,
       icon: FilesIcon,
-      items:
-        projects?.map((project) => ({
-          title: project?.name,
-          url: `/projects/${project?._id}`,
-        })) || [],
+      items: projects.map((project) => ({
+        title: project?.name,
+        url: `/projects/${project?._id}`,
+      })),
     },
     {
       title: "Members",
       url: "#",
       icon: LucidePersonStanding,
-      items: [
-        { title: "General", url: "#" },
-        { title: "Team", url: "#" },
-        { title: "Billing", url: "#" },
-        { title: "Limits", url: "#" },
-      ],
+      items: users.map((user) => ({
+        title: user?.name,
+        url: "#", // Replace with actual member URL if needed
+      })),
     },
   ];
 
@@ -67,27 +75,28 @@ export function NavMain({ projects }: NavMainProps) {
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                <SidebarMenuButton tooltip={item?.title}>
+                  {item?.icon && <item.icon />}
+                  <span>{item?.title}</span>
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem
-                      key={subItem?.title || JSON.stringify(new Date())}
-                    >
-                      <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </a>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
-                </SidebarMenuSub>
-              </CollapsibleContent>
+
+              {item?.items && item?.items?.length > 0 && (
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item?.items?.map((subItem) => (
+                      <SidebarMenuSubItem key={uuidv4()}>
+                        <SidebarMenuSubButton asChild>
+                          <a href={subItem?.url}>
+                            <span>{subItem?.title}</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              )}
             </SidebarMenuItem>
           </Collapsible>
         ))}

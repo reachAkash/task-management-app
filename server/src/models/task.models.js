@@ -10,12 +10,10 @@ const taskSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    assignedTo: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the users assigned to the task
-      },
-    ],
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to the users assigned to the task
+    },
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project", // Reference to the project the task belongs to
@@ -25,6 +23,11 @@ const taskSchema = new mongoose.Schema(
       type: String,
       enum: ["not started", "in progress", "completed"],
       default: "not started",
+    },
+    priority: {
+      type: String,
+      enum: ["high", "low"],
+      default: "low",
     },
   },
   { timestamps: true }

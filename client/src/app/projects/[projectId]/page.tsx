@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { axiosInstance } from "@/axios/axiosInstance";
-import { getOneProjectRoute } from "@/axios/apiRoutes";
-import { ProjectInterface } from "@/utils/types";
+import { getOneProjectRoute, deleteProjectRoute } from "@/axios/apiRoutes";
+import { ProjectInterface, UserInterface } from "@/utils/types";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import {
@@ -16,19 +16,33 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Eye, Lock, PersonStanding, UserRound, Users } from "lucide-react";
-import TaskTable from "@/modules/project/ui/TaskTable";
+import {
+  ChevronsLeft,
+  Eye,
+  GripVertical,
+  Lock,
+  TimerOff,
+  UserRound,
+  Users,
+} from "lucide-react";
+import { TasksSection } from "@/modules/project/ui/TasksSection";
+import { useMemberStore } from "@/states/store";
+import { toast } from "sonner";
+import Link from "next/link";
 
 const ProjectPage = () => {
   const { projectId } = useParams() as { projectId: string };
+  const router = useRouter();
   const [project, setProject] = useState<ProjectInterface | null>(null);
+  const { members, setMembers } = useMemberStore();
   const [loading, setLoading] = useState(true);
 
   const getProjectDetails = async () => {
     try {
       const res = await axiosInstance.get(`${getOneProjectRoute}/${projectId}`);
-      console.log(res.data.data.tasks);
-      setProject(res.data?.data);
+      setMembers(res?.data?.data?.members);
+      setProject(res.data.data);
+      console.log(res.data.data);
     } catch (error) {
       console.error("Error fetching project:", error);
       setProject(null);
@@ -37,12 +51,53 @@ const ProjectPage = () => {
     }
   };
 
+  const handleDeleteProject = async (projectId: string) => {
+    try {
+      const response = await axiosInstance.delete(
+        `${deleteProjectRoute}/${projectId}`
+      );
+      console.log(response.data);
+      router.push("/");
+      toast.success(response.data.message || "Project deleted successfully");
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    }
+  };
+
+  const deadline = () => {
+    if (project && project.createdAt) {
+      const newDate = new Date(project.createdAt);
+      newDate.setDate(newDate.getDate() + 10); // Add 10 days
+
+      const formattedDate = newDate.toISOString().split("T")[0]; // Format the date to "YYYY-MM-DD"
+      return formattedDate; // Return the formatted date
+    } else {
+      return null; // Return null if project or createdAt is null
+    }
+  };
+
   useEffect(() => {
     if (projectId) getProjectDetails();
   }, [projectId]);
 
-  if (loading) return <div>Loading project...</div>;
-  if (!project) return <div>Project not found.</div>;
+  if (loading)
+    return (
+      <div className="w-screen h-screen text-sm text-muted-foreground flex items-center justify-center">
+        Loading project...
+      </div>
+    );
+  if (!project)
+    return (
+      <div className="w-screen h-screen  text-sm text-muted-foreground flex flex-col gap-2 items-center justify-center">
+        Project not found.
+        <Button>
+          <Link href="/">Home</Link>
+        </Button>
+      </div>
+    );
 
   return (
     <div className="w-full">
@@ -53,7 +108,7 @@ const ProjectPage = () => {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/">dashboard</BreadcrumbLink>
+                <BreadcrumbLink href="/">Projects</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
@@ -66,7 +121,12 @@ const ProjectPage = () => {
       <main className="w-full p-4 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">{project.name}</h1>
-          <Button variant="destructive">Delete</Button>
+          <Button
+            onClick={() => handleDeleteProject(projectId)}
+            variant="destructive"
+          >
+            Delete
+          </Button>
         </div>
         <p className="mt-2 text-muted-foreground">{project.description}</p>
         <div className="space-y-4">
@@ -76,7 +136,7 @@ const ProjectPage = () => {
               Visibility
             </div>
             <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <Lock className="size-4" />
+              <GripVertical className="size-4" />
               Private
             </div>
           </div>
@@ -86,18 +146,18 @@ const ProjectPage = () => {
               Created by
             </div>
             <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <Lock className="size-4" />
-              Private
+              <GripVertical className="size-4" />
+              {project?.createdBy?.name}
             </div>
           </div>
           <div className="flex items-center gap-6">
             <div className="w-fit flex items-center text-sm gap-2 rounded-full px-2 py-1">
-              <Eye className="size-4" />
+              <TimerOff className="size-4" />
               Deadline
             </div>
             <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <Lock className="size-4" />
-              {new Date().toISOString()}
+              <GripVertical className="size-4" />
+              {deadline()}
             </div>
           </div>
           <div className="flex items-center gap-6">
@@ -106,12 +166,21 @@ const ProjectPage = () => {
               Teams
             </div>
             <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <Lock className="size-4" />
-              Private
+              <ChevronsLeft className="size-4" />
+              {members && members.length > 0 ? (
+                members.map((member: UserInterface, index: number) => (
+                  <span key={member._id}>
+                    {member.name}
+                    {index < members.length - 1 ? ", " : ""}
+                  </span>
+                ))
+              ) : (
+                <span>No members assigned</span>
+              )}
             </div>
           </div>
         </div>
-        <TaskTable />
+        <TasksSection tasks={project.tasks} />
       </main>
     </div>
   );

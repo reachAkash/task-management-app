@@ -45,7 +45,6 @@ export function LoginForm({
         loginRoute,
         { email, password }
       );
-      console.log(data);
       toast.success(data?.message ?? "Success!");
       setOtpInitialised(true);
     } catch (err: any) {
