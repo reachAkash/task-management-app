@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ProjectInterface } from "@/utils/types";
 
 interface CreateTaskProps {
   onClose: () => void;
@@ -82,7 +83,7 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
             <SelectValue placeholder="Choose a project" />
           </SelectTrigger>
           <SelectContent className="w-full">
-            {projects.map((project: any) => (
+            {projects.map((project: ProjectInterface) => (
               <SelectItem key={project._id} value={project._id}>
                 {project.name}
               </SelectItem>

@@ -82,7 +82,12 @@ export function LoginForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    otpInitialised ? verifyOtp() : loginUser();
+    // otpInitialised ? verifyOtp() : loginUser();
+    if (otpInitialised) {
+      verifyOtp();
+    } else {
+      loginUser();
+    }
   };
 
   return (

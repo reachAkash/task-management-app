@@ -1,12 +1,10 @@
 "use client";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
-import { AppSidebar } from "./app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
@@ -17,15 +15,12 @@ import CreateProject from "@/components/CreateProject";
 import CreateTask from "@/components/CreateTask";
 import { ProjectsHome } from "@/modules/home/ui/ProjectsHome";
 import InviteTeam from "@/components/InviteTeam";
-import AssignTask from "@/components/AssignTask";
-import { useTaskStore } from "@/states/store";
 
-const page = () => {
+const Page = () => {
   const [open, setOpen] = useState(false);
   const [modalType, setModalType] = useState<
     "project" | "task" | "team" | "coming soon" | null
   >(null);
-  const { tasks } = useTaskStore();
 
   return (
     <SidebarInset>
@@ -141,4 +136,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

@@ -12,7 +12,7 @@ export const TasksSection = ({ tasks }: TasksSectionProps) => {
   return (
     <div className="w-full flex flex-col space-y-4">
       <div className="text-sm text-muted-foreground">
-      { 'role' in user && user.role === 'admin' ? "All Tasks" : "My Tasks" }
+        {user?.role === "admin" ? "All Tasks" : "My Tasks"}
       </div>
       {tasks.length === 0 && (
         <div className="w-full h-[50vh] flex items-center justify-center text-sm text-muted-foreground">

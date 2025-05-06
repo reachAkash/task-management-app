@@ -20,7 +20,6 @@ import {
   ChevronsLeft,
   Eye,
   GripVertical,
-  Lock,
   TimerOff,
   UserRound,
   Users,

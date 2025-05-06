@@ -5,12 +5,12 @@ import { create } from "zustand";
 
 // ---------------------- USER STORE ----------------------
 interface UserStore {
-  user: UserInterface | {};
+  user: UserInterface | null | undefined;
   setUser: (newUser: UserInterface) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
-  user: {},
+  user: null,
   setUser: (newUser) => set({ user: newUser }),
 }));
 
@@ -35,7 +35,7 @@ interface TaskStore {
   tasks: TaskInterface[];
   setTasks: (newTasks: TaskInterface[]) => void;
   removeTask: (id: string) => void;
-  fetchAllTasks: (projectId:string) => Promise<void>;
+  fetchAllTasks: (projectId: string) => Promise<void>;
 }
 
 export const useTaskStore = create<TaskStore>((set) => ({
@@ -45,15 +45,15 @@ export const useTaskStore = create<TaskStore>((set) => ({
     set((state) => ({
       tasks: state.tasks.filter((task) => task._id !== id),
     })),
-    fetchAllTasks: async (projectId: string) => {
-      try {
-        const res = await axiosInstance.get(`${getTasksRoute}/${projectId}`);
-        console.log(res.data);
-        set({ tasks: res.data.data });
-      } catch (err) {
-        console.error("Failed to fetch tasks", err);
-      }
-    },
+  fetchAllTasks: async (projectId: string) => {
+    try {
+      const res = await axiosInstance.get(`${getTasksRoute}/${projectId}`);
+      console.log(res.data);
+      set({ tasks: res.data.data });
+    } catch (err) {
+      console.error("Failed to fetch tasks", err);
+    }
+  },
 }));
 
 // ---------------------- MEMBER STORE ----------------------

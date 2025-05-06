@@ -121,7 +121,7 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
             <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            {"role" in user && user.role === "admin" && (
+            {user?.role === "admin" && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-40">
@@ -158,7 +158,7 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
             </DropdownMenuSub>
 
             {/* Modify Priority */}
-            {"role" in user && user.role === "admin" && (
+            {user?.role === "admin" && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Modify Priority</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-40">
@@ -179,7 +179,7 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
               </DropdownMenuSub>
             )}
 
-            {"role" in user && user.role === "admin" && (
+            {user?.role === "admin" && (
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();

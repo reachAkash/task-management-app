@@ -15,15 +15,14 @@ import {
 } from "@/components/ui/sidebar";
 import { axiosInstance } from "@/axios/axiosInstance";
 import { getSingleUserRoute, refreshTokenRoute } from "@/axios/apiRoutes";
-import { useProjectStore, useTaskStore, useUserStore } from "@/states/store";
-import { ProjectInterface } from "@/utils/types";
+import { useProjectStore, useUserStore } from "@/states/store";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useUsers } from "@/hooks/useUsers";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
-  const { users, loading } = useUsers();
+  const { users } = useUsers();
   const { user, setUser } = useUserStore();
   const { projects, setProjects } = useProjectStore();
 

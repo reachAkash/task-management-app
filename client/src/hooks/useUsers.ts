@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/axios/axiosInstance";
 import { getUsersDataRoute } from "@/axios/apiRoutes"; // adjust path
-import { refreshTokenRoute } from "@/axios/apiRoutes"; // adjust path
 import { useMemberStore } from "@/states/store";
 
 export const useUsers = () => {
@@ -17,7 +16,7 @@ export const useUsers = () => {
       setUsers(usersData);
       setMembers(usersData);
     } catch (err: any) {
-      console.error("Other error:", err);
+      console.log("Other error:", err);
     } finally {
       setLoading(false);
     }

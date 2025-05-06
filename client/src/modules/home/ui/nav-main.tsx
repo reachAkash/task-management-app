@@ -100,19 +100,19 @@ export function NavMain({ projects = [], users = [] }: NavMainProps) {
                             <div
                               className={cn(
                                 `${
-                                  subItem.role === "admin"
+                                  subItem?.role === "admin"
                                     ? "bg-amber-400 text-white hover:bg-amber-400"
                                     : ""
                                 }flex items-center`
                               )}
                             >
-                              {"role" in user && subItem.role === "admin" && (
+                              {subItem.role === "admin" && (
                                 <span>
                                   <CrownIcon className="size-4 text-white" />
                                 </span>
                               )}
                               <span>{subItem?.title}</span>
-                              {"_id" in user && subItem.id == user._id && (
+                              {subItem?.id == user?._id && (
                                 <span className="text-[9px]">(You)</span>
                               )}
                             </div>

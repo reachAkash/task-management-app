@@ -27,7 +27,7 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard = ({ item }: ProjectCardProps) => {
-  const { projects, setProjects, removeProject } = useProjectStore();
+  const { removeProject } = useProjectStore();
 
   const handleDelete = async (id: string) => {
     try {
