@@ -14,7 +14,7 @@ app.use(morgan("combined"));
 app.use(
   cors({
     origin:
-      "https://task-management-app-git-feature-96de48-vaishnavakashs-projects.vercel.app",
+      "https://task-management-app-git-feature-376ce8-vaishnavakashs-projects.vercel.app",
     credentials: true,
   })
 );
