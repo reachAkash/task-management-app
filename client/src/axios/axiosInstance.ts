@@ -6,7 +6,7 @@ const devMode = true;
 export const axiosInstance = axios.create({
   baseURL: devMode
     ? "http://localhost:4000/api/v1"
-    : "https://bf15-2409-40e0-1c-6975-c152-9196-a72c-d098.ngrok-free.app/api/v1",
+    : "https://task-management-app-oll7.onrender.com/api/v1",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

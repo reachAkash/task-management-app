@@ -93,7 +93,7 @@ module.exports = {
     }
   }),
 
-  promoteUser: asyncHandler(async (req, res, next) => {
+  promoteToAdmin: asyncHandler(async (req, res, next) => {
     const { userId } = req.body;
 
     if (!userId) {
@@ -106,10 +106,10 @@ module.exports = {
         return errorResponse(res, 404, "User not found");
       }
 
-      user.role = "manager";
+      user.role = "admin";
       await user.save();
 
-      return successResponse(res, 200, "User promoted to manager");
+      return successResponse(res, 200, "User promoted to admin");
     } catch (err) {
       next(err);
     }

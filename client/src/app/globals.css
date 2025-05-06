@@ -120,3 +120,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+.responsive-heading {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

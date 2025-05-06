@@ -9,12 +9,10 @@ const {} = require("../controllers/task.controllers.js");
 const {
   banUser,
   removeUser,
-  promoteUser,
+  promoteToAdmin,
 } = require("../controllers/admin.controllers.js");
 
-router.post("/create-user", AuthenticateRequest, isAdmin, createUser);
-router.post("/create-admin", createUser);
-router.put("/promote", AuthenticateRequest, isAdmin, promoteUser);
+router.put("/promote-admin", AuthenticateRequest, promoteToAdmin);
 router.post("/remove-user", AuthenticateRequest, isAdmin, removeUser);
 router.post("/ban-user", AuthenticateRequest, isAdmin, banUser);
 module.exports = router;

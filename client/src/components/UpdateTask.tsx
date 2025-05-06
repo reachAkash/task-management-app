@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { axiosInstance } from "@/axios/axiosInstance";
 import { toast } from "sonner";
-import { createTaskRoute } from "@/axios/apiRoutes";
+import { updateTaskRoute } from "@/axios/apiRoutes";
 import { Loader2Icon } from "lucide-react";
-import { useProjectStore, useTaskStore } from "@/states/store";
+import { useMemberStore, useProjectStore, useTaskStore } from "@/states/store";
 import {
   Select,
   SelectContent,
@@ -17,15 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProjectInterface } from "@/utils/types";
+import { ProjectInterface, UserInterface } from "@/utils/types";
 import { useParams } from "next/navigation";
-import { Calendar } from "./ui/calendar";
+import { priorityOptions, statusOptions } from "@/utils/constants";
 
-interface CreateTaskProps {
+interface UpdateTaskProps {
   onClose: () => void;
+  taskId: string;
 }
 
-const CreateTask = ({ onClose }: CreateTaskProps) => {
+const UpdateTask = ({ onClose, taskId }: UpdateTaskProps) => {
   const { projectId: paramsProjectId } = useParams() as { projectId: string };
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -34,27 +35,42 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
   const [loading, setLoading] = useState(false);
   const { projects } = useProjectStore();
   const { fetchAllTasks } = useTaskStore();
+  const [priority, setPriority] = useState("");
+  const [status, setStatus] = useState("");
+
+  const nullifyState = () => {
+    setTitle("");
+    setDescription("");
+    setProjectId("");
+    setPriority("");
+    setStatus("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim() || !projectId.trim()) {
+    if (
+      !title.trim() &&
+      !description.trim() &&
+      !projectId.trim() &&
+      !status &&
+      !priority
+    ) {
       toast.error("All fields are required");
       return;
     }
 
     setLoading(true);
     try {
-      const { data } = await axiosInstance.post(createTaskRoute, {
+      const { data } = await axiosInstance.put(`${updateTaskRoute}/${taskId}`, {
         title,
         description,
-        projectId,
         deadline,
+        priority: priority.toLowerCase(),
+        status: status.toLowerCase(),
       });
       console.log(data);
-      toast.success(data.message || "Task created!");
-      setTitle("");
-      setDescription("");
-      setProjectId("");
+      toast.success(data.message || "Task updated!");
+      nullifyState();
       setDeadline(undefined);
       fetchAllTasks(projectId);
       onClose();
@@ -82,7 +98,6 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter task title"
-          required
         />
       </div>
 
@@ -106,6 +121,7 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
         </div>
       )}
 
+      {/* Deadline */}
       <div className="space-y-2">
         <Label htmlFor="deadline" className="text-sm">
           Deadline
@@ -120,6 +136,44 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
         />
       </div>
 
+      {/* Priority */}
+      <div className="space-y-2">
+        <Label htmlFor="priority" className="text-sm">
+          Priority
+        </Label>
+        <Select value={priority} onValueChange={setPriority}>
+          <SelectTrigger id="priority" className="w-full">
+            <SelectValue placeholder="Select priority" />
+          </SelectTrigger>
+          <SelectContent>
+            {priorityOptions.map((level) => (
+              <SelectItem key={level} value={level}>
+                {level}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Status */}
+      <div className="space-y-2">
+        <Label htmlFor="status" className="text-sm">
+          Status
+        </Label>
+        <Select value={status} onValueChange={setStatus}>
+          <SelectTrigger id="status" className="w-full">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="description" className="text-sm">
           Description
@@ -130,7 +184,6 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe the task"
           rows={4}
-          required
         />
       </div>
 
@@ -142,4 +195,4 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
   );
 };
 
-export default CreateTask;
+export default UpdateTask;

@@ -14,6 +14,7 @@ const taskSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Reference to the users assigned to the task
     },
+
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project", // Reference to the project the task belongs to
@@ -26,8 +27,11 @@ const taskSchema = new mongoose.Schema(
     },
     priority: {
       type: String,
-      enum: ["high", "low"],
+      enum: ["high", "medium", "low"],
       default: "low",
+    },
+    deadline: {
+      type: Date,
     },
   },
   { timestamps: true }

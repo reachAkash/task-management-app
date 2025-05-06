@@ -29,6 +29,7 @@ export interface TaskInterface {
   projectId: string; // ID of the project this task belongs to
   status: "not started" | "in progress" | "completed"; // Status of the task
   createdAt: string; // Timestamp when the task was created
+  deadline: string;
   updatedAt: string; // Timestamp when the task was last updated
   priority: string;
   __v: number; // Version key from MongoDB

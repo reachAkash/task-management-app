@@ -43,14 +43,15 @@ export const ProjectCard = ({ item }: ProjectCardProps) => {
   };
 
   return (
-    <Link href={`/projects/${item?._id}`}>
-      <Card
-        key={item?._id || JSON.stringify(new Date())}
-        className="hover:bg-gray-50/60 transition-colors duration-300 cursor-pointer"
-      >
+    <Link
+      href={`/projects/${item?._id}`}
+      className="w-full sm:w-[48%] lg:w-[30%] xl:w-[32%] 2xl:w-[32%] flex-grow-0"
+    >
+      <Card className="h-full min-h-[180px] hover:bg-gray-50/60 transition-colors duration-300 cursor-pointer flex flex-col justify-between">
         <CardHeader className="flex flex-row items-start justify-between space-y-0">
-          <CardTitle className="text-base">{item?.name}</CardTitle>
-
+          <CardTitle className="text-base truncate max-w-[80%]">
+            {item?.name}
+          </CardTitle>
           <DropdownMenu>
             <DropdownMenuTrigger>
               <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
@@ -60,6 +61,7 @@ export const ProjectCard = ({ item }: ProjectCardProps) => {
                 className="text-red-600"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click
+                  e.preventDefault();
                   handleDelete(item._id);
                 }}
               >
@@ -70,20 +72,21 @@ export const ProjectCard = ({ item }: ProjectCardProps) => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <CardDescription>
-            {item?.description?.split(" ").slice(0, 8).join(" ")}
-            {item?.description?.split(" ").length > 8 && " ..."}
+          <CardDescription className="clamp-3">
+            {item?.description?.split(" ").slice(0, 10).join(" ")}
+            {item?.description?.split(" ").length > 8 && "..."}
           </CardDescription>
-          <CardFooter>
-            <div className="w-full text-sm text-shadow-muted-foreground flex items-center justify-end gap-2">
-              <Avatar className="h-5 w-5 rounded-full">
-                <AvatarImage src="/userLogo.jpeg" alt={item?.createdBy?.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
-              {item?.createdBy?.name}
-            </div>
-          </CardFooter>
         </CardContent>
+
+        <CardFooter className="mt-auto pt-2">
+          <div className="w-full text-sm text-muted-foreground flex items-center justify-end gap-2">
+            <Avatar className="h-5 w-5 rounded-full">
+              <AvatarImage src="/userLogo.jpeg" alt={item?.createdBy?.name} />
+              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+            </Avatar>
+            {item?.createdBy?.name}
+          </div>
+        </CardFooter>
       </Card>
     </Link>
   );

@@ -1,4 +1,4 @@
-import { getTasksRoute } from "@/axios/apiRoutes";
+import { getSingleUserRoute, getTasksRoute } from "@/axios/apiRoutes";
 import { axiosInstance } from "@/axios/axiosInstance";
 import { ProjectInterface, TaskInterface, UserInterface } from "@/utils/types";
 import { create } from "zustand";
@@ -7,11 +7,21 @@ import { create } from "zustand";
 interface UserStore {
   user: UserInterface | null | undefined;
   setUser: (newUser: UserInterface) => void;
+  fetchUser: () => Promise<void>;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
   setUser: (newUser) => set({ user: newUser }),
+  fetchUser: async () => {
+    try {
+      const res = await axiosInstance.get(`${getSingleUserRoute}/`);
+      console.log(res.data);
+      set({ user: res.data.data });
+    } catch (err) {
+      console.error("Failed to fetch tasks", err);
+    }
+  },
 }));
 
 // ---------------------- PROJECT STORE ----------------------

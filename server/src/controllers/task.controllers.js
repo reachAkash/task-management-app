@@ -2,6 +2,7 @@ const { Project } = require("../models/project.models");
 const { Task } = require("../models/task.models");
 const { User } = require("../models/user.models");
 const { asyncHandler } = require("../utils/asyncHandler.utils");
+const { sendTaskAssignEmail } = require("../utils/emailHelper.utils");
 const {
   errorResponse,
   successResponse,
@@ -20,7 +21,13 @@ module.exports = {
   }),
 
   createTask: asyncHandler(async (req, res, next) => {
-    const { title, description, projectId, priority = "low" } = req.body;
+    const {
+      title,
+      description,
+      projectId,
+      priority = "low",
+      deadline,
+    } = req.body;
 
     if (!title || !description || !projectId) {
       return res
@@ -38,12 +45,18 @@ module.exports = {
       return errorResponse(res, 404, "Project not found");
     }
 
-    const task = await Task.create({
+    const taskData = {
       title,
       description,
       projectId,
       priority,
-    });
+    };
+
+    if (deadline) {
+      taskData.deadline = deadline;
+    }
+
+    const task = await Task.create(taskData);
 
     project.tasks.push(task._id);
     await project.save();
@@ -93,20 +106,24 @@ module.exports = {
     task.assignedTo = userId;
     await task.save();
 
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: { tasks: task._id },
-    });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { tasks: task._id } },
+      { new: true } // get updated user with email
+    );
+
+    sendTaskAssignEmail(user.email, task.title);
 
     return successResponse(res, 200, "Task assigned successfully", task);
   }),
 
   updateTask: asyncHandler(async (req, res, next) => {
     const { taskId } = req.params;
-    const { title, description, status, priority } = req.body;
+    const { title, description, status, priority, deadline } = req.body;
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    if (!title && !description && !status && !priority) {
+    if (!title && !description && !status && !priority && !deadline) {
       return errorResponse(res, 400, "No task fields provided to update.");
     }
 
@@ -118,18 +135,16 @@ module.exports = {
     const isAssignedUser = task.assignedTo?.toString() === userId;
     const isManagerOrAdmin = ["manager", "admin"].includes(userRole);
 
-    // If user is neither admin nor manager
+    // Non-admin/manager users can only update status (if assigned)
     if (!isManagerOrAdmin) {
-      // Users can ONLY update status — and only if they are assigned
       if (!status || !isAssignedUser) {
         return errorResponse(
           res,
           403,
-          "You are only allowed to update status of your assigned tasks."
+          "You are only allowed to update the status of your assigned tasks."
         );
       }
 
-      // Only allow status update
       task.status = status;
       await task.save();
       return successResponse(
@@ -140,11 +155,12 @@ module.exports = {
       );
     }
 
-    // Manager/Admin logic: allow all updates
+    // Admin/Manager can update all fields
     if (title) task.title = title;
     if (description) task.description = description;
     if (status) task.status = status;
     if (priority) task.priority = priority;
+    if (deadline) task.deadline = deadline;
 
     await task.save();
     return successResponse(res, 200, "Task updated successfully.", task);

@@ -16,18 +16,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronsLeft,
-  Eye,
-  GripVertical,
-  TimerOff,
-  UserRound,
-  Users,
-} from "lucide-react";
+import { Eye, GripVertical, PlusIcon, UserRound, Users } from "lucide-react";
 import { TasksSection } from "@/modules/project/ui/TasksSection";
 import { useMemberStore, useTaskStore } from "@/states/store";
 import { toast } from "sonner";
 import Link from "next/link";
+import { ResponsiveModal } from "@/components/ResponsiveModal";
+import CreateTask from "@/components/CreateTask";
 
 const ProjectPage = () => {
   const { projectId } = useParams() as { projectId: string };
@@ -35,7 +30,8 @@ const ProjectPage = () => {
   const [project, setProject] = useState<ProjectInterface | null>(null);
   const { members, setMembers } = useMemberStore();
   const [loading, setLoading] = useState(true);
-  const { tasks, setTasks } = useTaskStore();
+  const { setTasks } = useTaskStore();
+  const [open, setOpen] = useState(false);
 
   const getProjectDetails = async () => {
     try {
@@ -101,16 +97,23 @@ const ProjectPage = () => {
 
   return (
     <div className="w-full">
+      <ResponsiveModal
+        title="Create task"
+        isOpen={open}
+        onClose={() => setOpen(false)}
+      >
+        <CreateTask onClose={() => setOpen(false)} />
+      </ResponsiveModal>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbItem>
                 <BreadcrumbLink href="/">Projects</BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbPage>{project?.name}</BreadcrumbPage>
               </BreadcrumbItem>
@@ -121,12 +124,17 @@ const ProjectPage = () => {
       <main className="w-full p-4 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">{project.name}</h1>
-          <Button
-            onClick={() => handleDeleteProject(projectId)}
-            variant="destructive"
-          >
-            Delete
-          </Button>
+          <div className="flex items-center gap-4">
+            <Button onClick={() => setOpen(true)}>
+              <PlusIcon /> New Task
+            </Button>
+            <Button
+              onClick={() => handleDeleteProject(projectId)}
+              variant="destructive"
+            >
+              Delete
+            </Button>
+          </div>
         </div>
         <p className="mt-2 text-muted-foreground">{project.description}</p>
         <div className="space-y-4">
@@ -152,21 +160,11 @@ const ProjectPage = () => {
           </div>
           <div className="flex items-center gap-6">
             <div className="w-fit flex items-center text-sm gap-2 rounded-full px-2 py-1">
-              <TimerOff className="size-4" />
-              Deadline
-            </div>
-            <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <GripVertical className="size-4" />
-              {deadline()}
-            </div>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="w-fit flex items-center text-sm gap-2 rounded-full px-2 py-1">
               <Users className="size-4" />
               Teams
             </div>
             <div className="w-fit bg-rose-100 text-rose-500 flex items-center text-sm gap-2 border rounded-full px-4 py-1">
-              <ChevronsLeft className="size-4" />
+              <GripVertical className="size-4" />
               {members && members.length > 0 ? (
                 members.map((member: UserInterface, index: number) => (
                   <span key={member._id}>
@@ -180,7 +178,7 @@ const ProjectPage = () => {
             </div>
           </div>
         </div>
-        <TasksSection tasks={tasks} />
+        <TasksSection />
       </main>
     </div>
   );

@@ -7,6 +7,9 @@ import {
   PieChart,
 } from "lucide-react";
 
+export const statusOptions = ["Not started", "In progress", "Completed"];
+export const priorityOptions = ["High", "Medium", "Low"];
+
 export const teams = [
   {
     name: "Taskify Inc",
