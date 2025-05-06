@@ -69,7 +69,7 @@ userSchema.methods.generateAccessToken = function () {
   };
 
   const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "3d",
+    expiresIn: "1d",
   });
 
   return accessToken;
@@ -83,7 +83,7 @@ userSchema.methods.generateRefreshToken = function () {
   };
 
   const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: "14d",
+    expiresIn: "7d",
   });
 
   return refreshToken;

@@ -121,14 +121,14 @@ module.exports = {
         .cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
-          maxAge: 3600000,
+          sameSite: "None",
+          maxAge: 24 * 60 * 60 * 1000,
         })
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
-          maxAge: 604800000,
+          sameSite: "None",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
       const {
@@ -163,7 +163,7 @@ module.exports = {
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict",
+        sameSite: "None",
         maxAge: 3600000, // 1 hour
       });
 
