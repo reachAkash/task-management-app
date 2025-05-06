@@ -9,7 +9,7 @@ import { axiosInstance } from "@/axios/axiosInstance";
 import { toast } from "sonner";
 import { updateTaskRoute } from "@/axios/apiRoutes";
 import { Loader2Icon } from "lucide-react";
-import { useMemberStore, useProjectStore, useTaskStore } from "@/states/store";
+import { useProjectStore, useTaskStore } from "@/states/store";
 import {
   Select,
   SelectContent,
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProjectInterface, UserInterface } from "@/utils/types";
+import { ProjectInterface } from "@/utils/types";
 import { useParams } from "next/navigation";
 import { priorityOptions, statusOptions } from "@/utils/constants";
 

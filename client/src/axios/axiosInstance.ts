@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Create an Axios instance
-const devMode = true;
+const devMode = false;
 
 export const axiosInstance = axios.create({
   baseURL: devMode

@@ -63,18 +63,6 @@ const ProjectPage = () => {
     }
   };
 
-  const deadline = () => {
-    if (project && project.createdAt) {
-      const newDate = new Date(project.createdAt);
-      newDate.setDate(newDate.getDate() + 10); // Add 10 days
-
-      const formattedDate = newDate.toISOString().split("T")[0]; // Format the date to "YYYY-MM-DD"
-      return formattedDate; // Return the formatted date
-    } else {
-      return null; // Return null if project or createdAt is null
-    }
-  };
-
   useEffect(() => {
     if (projectId) getProjectDetails();
   }, [projectId]);

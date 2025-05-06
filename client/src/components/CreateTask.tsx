@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select";
 import { ProjectInterface } from "@/utils/types";
 import { useParams } from "next/navigation";
-import { Calendar } from "./ui/calendar";
 
 interface CreateTaskProps {
   onClose: () => void;

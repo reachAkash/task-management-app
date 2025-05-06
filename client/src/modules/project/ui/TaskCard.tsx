@@ -12,17 +12,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ellipsis, AlertCircle, SquarePen } from "lucide-react";
 import { toast } from "sonner";
 import { axiosInstance } from "@/axios/axiosInstance";
-import {
-  assignTaskRoute,
-  deleteTaskRoute,
-  updateTaskRoute,
-} from "@/axios/apiRoutes";
+import { assignTaskRoute, deleteTaskRoute } from "@/axios/apiRoutes";
 import { TaskInterface, UserInterface } from "@/utils/types";
 import { useMemberStore, useTaskStore, useUserStore } from "@/states/store";
 import { useState } from "react";
 import { ResponsiveModal } from "@/components/ResponsiveModal";
 import UpdateTask from "@/components/UpdateTask";
-import { priorityOptions, statusOptions } from "@/utils/constants";
 
 const statusColors: Record<string, string> = {
   "not started": "bg-gray-300 text-gray-800",
@@ -70,23 +65,6 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
     } catch (err: any) {
       toast.error(
         err.response?.data?.message || "Failed to assign task. Try again."
-      );
-    }
-  };
-
-  const handleTaskUpdate = async (
-    field: "status" | "priority",
-    value: string
-  ) => {
-    try {
-      const data = await axiosInstance.put(`${updateTaskRoute}/${item._id}`, {
-        [field]: value.toLowerCase(),
-      });
-      toast.success(data.data.message);
-      await fetchAllTasks(item.projectId);
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Something went wrong. Please try again."
       );
     }
   };
