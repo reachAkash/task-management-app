@@ -11,7 +11,13 @@ const projectRoutes = require("./routes/project.routes.js");
 
 // initial configurations
 app.use(morgan("combined"));
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin:
+      "https://task-management-app-git-feature-96de48-vaishnavakashs-projects.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());
