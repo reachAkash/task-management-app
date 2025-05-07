@@ -149,7 +149,7 @@ const HomeLayout = ({ children }: { children: React.ReactNode }) => {
               setModalType("coming soon");
               setOpen(true);
             }}
-            className="w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.5rem)] lg:w-[calc(33.33%-0.8rem)] xl:w-[calc(25%-0.8rem)] flex px-6 py-4 items-center gap-x-4 border cursor-pointer hover:bg-gray-50/60 transition-all ease-in-out duration-300 rounded-lg shadow-sm overflow-hidden"
+            className="w-full hidden md:block md:w-[calc(50%-0.5rem)] lg:w-[calc(33.33%-0.8rem)] xl:w-[calc(25%-0.8rem)] px-6 py-4 items-center gap-x-4 border cursor-pointer hover:bg-gray-50/60 transition-all ease-in-out duration-300 rounded-lg shadow-sm overflow-hidden"
           >
             <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
               <ClipboardList className="size-4" />
