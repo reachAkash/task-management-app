@@ -90,7 +90,6 @@ export function NavMain({ projects = [] }: NavMainProps) {
       const { data } = await axiosInstance.post(deleteUserRoute, {
         userId,
       });
-      console.log(data);
       toast.success(data.message);
       const updatedUsers = users.filter((u) => u._id !== userId);
       setUsers(updatedUsers);
@@ -170,8 +169,9 @@ export function NavMain({ projects = [] }: NavMainProps) {
                               </span>
                             )}
 
-                            {subItem.role === "user" &&
-                              subItem.id !== user?._id && (
+                            {user?.role === "admin" &&
+                              subItem.role === "user" &&
+                              user._id !== subItem.id && (
                                 <Trash2
                                   onClick={() => {
                                     setOpen(true);

@@ -69,12 +69,21 @@ module.exports = {
         );
       }
 
-      const existingProject = await Project.findOne({ name: projectName });
+      // 🔍 Check if the user already has a project with the same name
+      const existingProject = await Project.findOne({
+        name: projectName.trim(),
+        createdBy: req.user._id, // <-- Now it checks specifically for that user
+      });
 
       if (existingProject) {
-        return errorResponse(res, 400, "Project with this name already exists");
+        return errorResponse(
+          res,
+          400,
+          "You already have a project with this name"
+        );
       }
 
+      // 🚀 Create a new project if no conflict
       const newProject = await Project.create({
         name: projectName.trim(),
         description: description.trim(),
@@ -82,8 +91,9 @@ module.exports = {
         createdBy: req.user._id, // Track who created the project
       });
 
+      // 🔗 Add the project to the user's list of projects
       await User.findByIdAndUpdate(req.user._id, {
-        $push: { projects: newProject._id }, // Add the project to the user's projects
+        $push: { projects: newProject._id },
       });
 
       return successResponse(
