@@ -2,10 +2,10 @@
 
 import * as React from "react";
 
-import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
+import { NavMain } from "./NavMain";
+import { NavProjects } from "./NavProjects";
+import { NavUser } from "./NavUser";
+import { TeamSwitcher } from "./TeamSwitcher";
 import {
   Sidebar,
   SidebarContent,
@@ -14,10 +14,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useProjectStore, useUserStore } from "@/states/store";
-import { useUsers } from "@/hooks/useUsers";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { users } = useUsers();
   const { user } = useUserStore();
   const { projects } = useProjectStore();
 
@@ -27,7 +25,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain projects={projects} users={users} />
+        <NavMain projects={projects} />
         <NavProjects />
       </SidebarContent>
       <SidebarFooter>

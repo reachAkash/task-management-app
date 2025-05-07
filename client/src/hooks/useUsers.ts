@@ -26,5 +26,5 @@ export const useUsers = () => {
     fetchUsers();
   }, []);
 
-  return { users, loading };
+  return { users, loading, setUsers };
 };

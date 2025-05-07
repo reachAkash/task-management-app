@@ -138,28 +138,28 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
             </div>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {user?.role === "admin" && (
+          {user?.role === "admin" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-40">
                     {members?.map((user: UserInterface) => (
                       <DropdownMenuItem
                         key={user?._id}
-                        onClick={() => handleAssign(user?._id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssign(user?._id);
+                        }}
                       >
                         {user?.name}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
-              )}
-
-              {user?.role === "admin" && (
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
@@ -169,9 +169,9 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
                 >
                   Delete
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         <div>

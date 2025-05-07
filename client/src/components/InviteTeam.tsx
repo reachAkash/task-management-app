@@ -7,7 +7,7 @@ import { axiosInstance } from "@/axios/axiosInstance";
 import { toast } from "sonner";
 import { inviteToProjectRoute } from "@/axios/apiRoutes";
 import { Loader2Icon } from "lucide-react";
-import { useMemberStore, useProjectStore } from "@/states/store";
+import { useProjectStore } from "@/states/store";
 import {
   Select,
   SelectContent,
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useUsers } from "@/hooks/useUsers";
 
 interface CreateTaskProps {
   onClose: () => void;
@@ -24,9 +25,8 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
   const [userId, setUserId] = useState(""); // separate state for user
   const [projectId, setProjectId] = useState(""); // separate state for project
   const [loading, setLoading] = useState(false);
-
+  const { users } = useUsers();
   const { projects } = useProjectStore();
-  const { members } = useMemberStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
             <SelectValue placeholder="Select a user" />
           </SelectTrigger>
           <SelectContent className="w-full">
-            {members.map((member: any) => (
+            {users.map((member: any) => (
               <SelectItem key={member._id} value={member._id}>
                 {member.name}
               </SelectItem>

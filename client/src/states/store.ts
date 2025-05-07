@@ -16,7 +16,6 @@ export const useUserStore = create<UserStore>((set) => ({
   fetchUser: async () => {
     try {
       const res = await axiosInstance.get(`${getSingleUserRoute}/`);
-      console.log(res.data);
       set({ user: res.data.data });
     } catch (err) {
       console.error("Failed to fetch tasks", err);
@@ -58,7 +57,6 @@ export const useTaskStore = create<TaskStore>((set) => ({
   fetchAllTasks: async (projectId: string) => {
     try {
       const res = await axiosInstance.get(`${getTasksRoute}/${projectId}`);
-      console.log(res.data);
       set({ tasks: res.data.data });
     } catch (err) {
       console.error("Failed to fetch tasks", err);

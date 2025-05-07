@@ -1,3 +1,5 @@
+"use client";
+
 import { useProjectStore } from "@/states/store";
 import { ProjectInterface } from "@/utils/types";
 import { ProjectCard } from "./ProjectCard";
@@ -11,7 +13,7 @@ export const ProjectsHome = () => {
 
       {projects.length === 0 ? (
         <div className="w-full h-[50vh] flex items-center justify-center text-sm text-muted-foreground">
-          Loading Projects...
+          No Projects...
         </div>
       ) : (
         <div className="w-full flex flex-wrap gap-4">

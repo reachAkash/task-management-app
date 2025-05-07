@@ -1,3 +1,4 @@
+"use client";
 import { TaskInterface } from "@/utils/types";
 import { TaskCard } from "./TaskCard";
 import { useTaskStore, useUserStore } from "@/states/store";

@@ -68,7 +68,6 @@ const UpdateTask = ({ onClose, taskId }: UpdateTaskProps) => {
         priority: priority.toLowerCase(),
         status: status.toLowerCase(),
       });
-      console.log(data);
       toast.success(data.message || "Task updated!");
       nullifyState();
       setDeadline(undefined);

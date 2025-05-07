@@ -19,16 +19,15 @@ module.exports = {
   }),
   getSingleUser: asyncHandler(async (req, res, next) => {
     try {
-      const user = await User.findById(req.user._id)
-        .populate({
-          path: "projects",
-          populate: {
-            path: "createdBy",
-            model: "User",
-            select: "-password -refreshToken -otpExpiry -__v", // exclude sensitive fields
-          },
-        })
-        .populate("tasks"); // assuming tasks doesn't need further population
+      const user = await User.findById(req.user._id).populate({
+        path: "projects",
+        populate: {
+          path: "createdBy",
+          model: "User",
+          select: "name email role",
+        },
+      });
+
 
       if (!user) {
         return errorResponse(res, 404, "User not found");

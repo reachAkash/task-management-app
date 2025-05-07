@@ -9,12 +9,12 @@ const adminRoutes = require("./routes/admin.routes.js");
 const taskRoutes = require("./routes/task.routes.js");
 const projectRoutes = require("./routes/project.routes.js");
 
+const devMode = false ? "http://localhost:3000" : process.env.FRONTEND_URL;
 // initial configurations
 app.use(morgan("combined"));
 app.use(
   cors({
-    origin:
-      "https://task-management-app-git-feature-376ce8-vaishnavakashs-projects.vercel.app",
+    origin: devMode,
     credentials: true,
   })
 );

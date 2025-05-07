@@ -49,7 +49,6 @@ const CreateTask = ({ onClose }: CreateTaskProps) => {
         projectId,
         deadline,
       });
-      console.log(data);
       toast.success(data.message || "Task created!");
       setTitle("");
       setDescription("");
