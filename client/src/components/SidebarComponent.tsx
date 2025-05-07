@@ -3,8 +3,7 @@
 import React from "react";
 import { SidebarProvider } from "./ui/sidebar";
 import { AppSidebar } from "@/modules/home/ui/AppSidebar";
-import { usePathname, notFound } from "next/navigation";
-import { Button } from "react-day-picker";
+import { usePathname } from "next/navigation";
 
 const SidebarComponent = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
