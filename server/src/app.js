@@ -15,6 +15,7 @@ const allowedOrigins = [
   process.env.CORS_ORIGIN,
 ];
 
+app.use(morgan("combined"));
 app.use(
   cors({
     origin: (origin, callback) => {

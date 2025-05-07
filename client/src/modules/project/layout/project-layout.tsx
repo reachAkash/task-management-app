@@ -163,7 +163,7 @@ const ProjectLayout = ({ children }: { children: React.ReactNode }) => {
               {members && members.length > 0 ? (
                 members.map((member: UserInterface, index: number) => (
                   <span key={member._id}>
-                    {member.email}
+                    {member.name}
                     {index < members.length - 1 ? ", " : ""}
                   </span>
                 ))
