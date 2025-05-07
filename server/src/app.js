@@ -9,15 +9,26 @@ const adminRoutes = require("./routes/admin.routes.js");
 const taskRoutes = require("./routes/task.routes.js");
 const projectRoutes = require("./routes/project.routes.js");
 
-const devMode = false ? "http://localhost:3000" : process.env.FRONTEND_URL;
-// initial configurations
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.TESTING_URL,
+  process.env.CORS_ORIGIN,
+];
+
 app.use(morgan("combined"));
 app.use(
   cors({
-    origin: devMode,
-    credentials: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // This allows cookies to be sent cross-origin
   })
 );
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.json());

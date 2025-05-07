@@ -28,7 +28,6 @@ module.exports = {
         },
       });
 
-
       if (!user) {
         return errorResponse(res, 404, "User not found");
       }
@@ -172,8 +171,19 @@ module.exports = {
     }
   }),
   logoutUser: asyncHandler(async (req, res) => {
-    res.clearCookie("accessToken", { httpOnly: true, secure: true });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+    });
     successResponse(res, 200, "Logged out successfully");
   }),
 };
