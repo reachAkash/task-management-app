@@ -140,10 +140,14 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
 
           {user?.role === "admin" && (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
                 <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent
+                onClick={(e) => e.stopPropagation()}
+                align="end"
+                className="w-48"
+              >
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent className="w-40">
