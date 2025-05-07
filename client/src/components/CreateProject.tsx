@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { createProjectRoute } from "@/axios/apiRoutes";
 import { Loader2Icon } from "lucide-react";
 import { useProjectStore } from "@/states/store";
-import { ProjectInterface } from "@/utils/types";
 
 interface CreateProjectProps {
   onClose: () => void;

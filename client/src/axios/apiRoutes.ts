@@ -15,3 +15,5 @@ export const deleteTaskRoute = "/tasks/delete";
 export const updateTaskRoute = "/tasks/update";
 export const assignTaskRoute = "/tasks/assign-task";
 export const getTasksRoute = "/tasks";
+export const promoteToAdminRoute = "/admin/promote-admin";
+export const deleteUserRoute = "/admin/ban-user";

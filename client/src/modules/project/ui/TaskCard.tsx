@@ -9,16 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Ellipsis, Paperclip, MessageSquare, AlertCircle } from "lucide-react";
+import { Ellipsis, AlertCircle, SquarePen } from "lucide-react";
 import { toast } from "sonner";
 import { axiosInstance } from "@/axios/axiosInstance";
-import {
-  assignTaskRoute,
-  deleteTaskRoute,
-  updateTaskRoute,
-} from "@/axios/apiRoutes";
+import { assignTaskRoute, deleteTaskRoute } from "@/axios/apiRoutes";
 import { TaskInterface, UserInterface } from "@/utils/types";
 import { useMemberStore, useTaskStore, useUserStore } from "@/states/store";
+import { useState } from "react";
+import { ResponsiveModal } from "@/components/ResponsiveModal";
+import UpdateTask from "@/components/UpdateTask";
 
 const statusColors: Record<string, string> = {
   "not started": "bg-gray-300 text-gray-800",
@@ -28,19 +27,19 @@ const statusColors: Record<string, string> = {
 
 const priorityColor: Record<string, string> = {
   high: "bg-red-500 text-white",
+  medium: "bg-purple-500 text-white",
   low: "bg-amber-300 text-white",
 };
-
-const statusOptions = ["Not started", "In progress", "Completed"];
-const priorityOptions = ["High", "Low"];
 
 export const TaskCard = ({ item }: { item: TaskInterface }) => {
   const { user } = useUserStore();
   const { members } = useMemberStore();
-  const { tasks, removeTask } = useTaskStore();
+  const { removeTask } = useTaskStore();
   const fetchAllTasks = useTaskStore((state) => state.fetchAllTasks);
-
-  console.log(tasks);
+  const [open, setOpen] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false);
+  const descriptionWords = item.description?.split(" ") || [];
+  const shouldShowToggle = descriptionWords.length > 8;
 
   const handleDelete = async (id: string) => {
     try {
@@ -59,9 +58,8 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
       const res = await axiosInstance.post(assignTaskRoute, {
         taskId: item._id,
         userId,
-        projectId: item.projectId, // Ensure item contains `projectId`
+        projectId: item.projectId,
       });
-      console.log(res.data.data);
       await fetchAllTasks(item.projectId);
       toast.success(res.data.message || "Task assigned successfully");
     } catch (err: any) {
@@ -71,161 +69,170 @@ export const TaskCard = ({ item }: { item: TaskInterface }) => {
     }
   };
 
-  const handleTaskUpdate = async (
-    field: "status" | "priority",
-    value: string
-  ) => {
-    try {
-      const data = await axiosInstance.put(`${updateTaskRoute}/${item._id}`, {
-        [field]: value.toLowerCase(),
-      });
-      toast.success(data.data.message);
-      await fetchAllTasks(item.projectId);
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message || "Something went wrong. Please try again."
-      );
+  const getDeadlineColor = (deadline: string) => {
+    const deadlineDate = new Date(deadline);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize time
+    const timeDiff = deadlineDate.getTime() - today.getTime();
+    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    let deadlineColor = "text-green-600"; // default future color
+
+    if (daysLeft < 0) {
+      deadlineColor = "text-red-600"; // past
+    } else if (daysLeft === 0) {
+      deadlineColor = "text-red-500"; // due today
+    } else if (daysLeft <= 3) {
+      deadlineColor = "text-orange-500"; // soon
+    } else if (daysLeft <= 7) {
+      deadlineColor = "text-amber-500"; // moderate
     }
+
+    return { daysLeft, deadlineDate, deadlineColor };
+  };
+
+  const getDisplayedDescription = () => {
+    if (showFullDesc) return item.description;
+    return (
+      descriptionWords.slice(0, 8).join(" ") + (shouldShowToggle ? "..." : "")
+    );
   };
 
   return (
-    <Card className="p-4 bg-white border rounded-xl shadow-sm space-y-3">
-      <div className="flex justify-between items-start">
-        <div className="flex items-center gap-2">
-          {/* Priority Badge */}
-          <div
-            className={`text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1 ${
-              priorityColor[item?.priority?.toLowerCase()] ||
-              "bg-gray-200 text-gray-700"
-            }`}
-          >
-            <AlertCircle className="w-3.5 h-3.5" />
-            {item?.priority}
+    <>
+      {/* Edit Task Modal */}
+      <ResponsiveModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        title="Update task"
+      >
+        <UpdateTask onClose={() => setOpen(false)} taskId={item._id} />
+      </ResponsiveModal>
+
+      <Card
+        onClick={() => setOpen(true)}
+        className={`p-4 bg-white border cursor-pointer rounded-xl shadow-sm space-y-3 hover:bg-gray-50/60 transition-all duration-300 group ${
+          showFullDesc ? "min-h-fit" : "max-h-[250px]"
+        }`}
+      >
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2">
+            <div
+              className={`text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1 ${
+                priorityColor[item?.priority?.toLowerCase()] ||
+                "bg-gray-200 text-gray-700"
+              }`}
+            >
+              <AlertCircle className="w-3.5 h-3.5" />
+              {item?.priority}
+            </div>
+
+            <div
+              className={`text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1 ${
+                statusColors[item?.status?.toLowerCase()] ||
+                "bg-gray-200 text-gray-700"
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-current"></span>
+              {item?.status}
+            </div>
           </div>
 
-          {/* Status Badge */}
-          <div
-            className={`text-xs font-medium px-2 py-1 rounded-full flex items-center gap-1 ${
-              statusColors[item?.status?.toLowerCase()] ||
-              "bg-gray-200 text-gray-700"
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-current"></span>
-            {item?.status}
-          </div>
-        </div>
-
-        {/* Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {"role" in user && user.role === "admin" && (
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-40">
-                  {members?.map((user: UserInterface) => (
-                    <DropdownMenuItem
-                      key={user?._id}
-                      onClick={() => handleAssign(user?._id)}
-                    >
-                      {user?.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            )}
-
-            {/* Modify Status */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Modify Status</DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="w-40">
-                {statusOptions
-                  .filter(
-                    (status) =>
-                      status.toLowerCase() !== item.status?.toLowerCase()
-                  )
-                  .map((status) => (
-                    <DropdownMenuItem
-                      key={status}
-                      onClick={() => handleTaskUpdate("status", status)}
-                    >
-                      {status}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            {/* Modify Priority */}
-            {"role" in user && user.role === "admin" && (
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Modify Priority</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-40">
-                  {priorityOptions
-                    .filter(
-                      (priority) =>
-                        priority.toLowerCase() !== item.priority?.toLowerCase()
-                    )
-                    .map((priority) => (
+          {user?.role === "admin" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Assign Task</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-40">
+                    {members?.map((user: UserInterface) => (
                       <DropdownMenuItem
-                        key={priority}
-                        onClick={() => handleTaskUpdate("priority", priority)}
+                        key={user?._id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssign(user?._id);
+                        }}
                       >
-                        {priority}
+                        {user?.name}
                       </DropdownMenuItem>
                     ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            )}
-
-            {"role" in user && user.role === "admin" && (
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(item._id);
-                }}
-                className="text-red-600"
-              >
-                Delete
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Title + Description */}
-      <div>
-        <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
-        <p className="text-sm text-gray-500 mt-1">
-          {item?.description?.split(" ").slice(0, 8).join(" ")}
-          {item?.description?.split(" ").length > 8 && "..."}
-        </p>
-      </div>
-
-      {/* Footer Section */}
-      <div className="flex items-center justify-between mt-2">
-        {/* Avatar Group */}
-        <div className="flex space-x-2">
-          <Avatar className="w-6 h-6 border-2 border-white">
-            <AvatarImage src="/userLogo.jpeg" alt="User" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-          <div>{item?.assignedTo?.name}</div>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(item._id);
+                  }}
+                  className="text-red-600"
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
-        {/* Icons Section */}
-        <div className="flex items-center gap-4 text-gray-500 text-xs">
-          <div className="flex items-center gap-1">
-            <Paperclip className="w-4 h-4" />
-            <span>8</span>
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900">{item.title}</h3>
+          <p className="text-sm text-gray-500 mt-1 whitespace-pre-wrap">
+            {getDisplayedDescription()}
+          </p>
+          {shouldShowToggle && (
+            <button
+              onClick={() => setShowFullDesc((prev) => !prev)}
+              className="text-xs text-blue-500 mt-1 hover:underline focus:outline-none"
+            >
+              {showFullDesc ? "See less..." : "See more..."}
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-col text-sm text-gray-700">
+            <span className="text-xs text-gray-500 mb-1">Assigned to:</span>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-800">
+                {item?.assignedTo?.name ? (
+                  <span className="text-[12px] font-semibold">
+                    {item?.assignedTo?.name}
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">
+                    none
+                  </span>
+                )}
+              </div>
+              <Avatar className="w-8 h-8 border-2 border-white">
+                <AvatarImage src="/userLogo.jpeg" alt="User" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <MessageSquare className="w-4 h-4" />
-            <span>16</span>
+
+          <div className="flex items-center gap-4 text-gray-500 text-sm">
+            {item.deadline &&
+              (() => {
+                const { deadlineDate, deadlineColor } = getDeadlineColor(
+                  item.deadline
+                );
+                return (
+                  <div className={`text-xs ${deadlineColor}`}>
+                    Due: {deadlineDate.toLocaleDateString()}
+                  </div>
+                );
+              })()}
+
+            <div
+              onClick={() => setOpen(true)}
+              className="bg-primary/10 hidden group-hover:block rounded-full p-2 cursor-pointer"
+            >
+              <SquarePen className="size-4 text-primary" />
+            </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   );
 };

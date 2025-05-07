@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import { axiosInstance } from "@/axios/axiosInstance";
-import { loginRoute, otpRoute, registerRoute } from "@/axios/apiRoutes";
+import { otpRoute, registerRoute } from "@/axios/apiRoutes";
 import { toast } from "sonner";
 import { InputOTPPattern } from "@/components/InputOTPPattern";
 import { useRouter } from "next/navigation";
@@ -84,7 +84,11 @@ export function RegisterForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    otpInitialised ? verifyOtp() : RegisterUser();
+    if (otpInitialised) {
+      verifyOtp();
+    } else {
+      RegisterUser();
+    }
   };
 
   return (

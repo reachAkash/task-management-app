@@ -19,16 +19,15 @@ module.exports = {
   }),
   getSingleUser: asyncHandler(async (req, res, next) => {
     try {
-      const user = await User.findById(req.user._id)
-        .populate({
-          path: "projects",
-          populate: {
-            path: "createdBy",
-            model: "User",
-            select: "-password -refreshToken -otpExpiry -__v", // exclude sensitive fields
-          },
-        })
-        .populate("tasks"); // assuming tasks doesn't need further population
+      const user = await User.findById(req.user._id).populate({
+        path: "projects",
+        populate: {
+          path: "createdBy",
+          model: "User",
+          select: "name email role",
+        },
+      });
+
 
       if (!user) {
         return errorResponse(res, 404, "User not found");
@@ -121,14 +120,14 @@ module.exports = {
         .cookie("accessToken", accessToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
-          maxAge: 3600000,
+          sameSite: "None",
+          maxAge: 24 * 60 * 60 * 1000,
         })
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
-          maxAge: 604800000,
+          sameSite: "None",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
       const {
@@ -163,7 +162,7 @@ module.exports = {
       res.cookie("accessToken", newAccessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict",
+        sameSite: "None",
         maxAge: 3600000, // 1 hour
       });
 

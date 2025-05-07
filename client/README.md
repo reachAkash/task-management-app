@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Task Management Project
 
-## Getting Started
+### 🚀 Getting Started
 
-First, run the development server:
+To install and run the project locally, follow the steps below:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Clone the repository:**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   git clone <repository-url>
+   cd <repository-folder>
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. **Install Dependencies:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   - Navigate to the client folder and run:
 
-## Learn More
+     ```bash
+     cd client
+     npm install --force
+     ```
 
-To learn more about Next.js, take a look at the following resources:
+     > The `--force` flag is used due to dependency issues.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   - Navigate to the server folder and run:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+     ```bash
+     cd ../server
+     npm install
+     ```
 
-## Deploy on Vercel
+3. **Environment Variables:**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   - Make sure to add the required credentials in a `.env` file inside the `server` folder.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. **Run the Project Locally:**
+
+   - From the root directory, you can start both client and server:
+
+     ```bash
+     npm run dev
+     ```
+
+### 🔐 **Authentication & Authorization:**
+
+- Users must **Register** or **Login** to access the main dashboard. Unauthenticated users are redirected to the **Login Page**.
+- After logging in, users can view all the projects they have created.
+- There is an option to **Become an Admin** for extended privileges.
+
+### 🔒 **Role-based System:**
+
+- Two main roles:
+
+  - **Admin:** Full access to project and task management.
+  - **User:** Limited to their own projects unless invited to others.
+
+### 🗂️ **Admin Features:**
+
+- **Create Projects:** Admins can create new projects.
+- **Create Tasks:** Tasks can be added under projects.
+- **Invite Teams:** Admins can invite users to collaborate.
+- **CRUD Operations:** Full CRUD (Create, Read, Update, Delete) is available for projects and tasks.
+- **Update Task Details:** Status, priority, and other details can be modified.
+- **Remove Users:** Admins have the authority to remove users from projects.
+
+### 🔄 **Refresh Token Mechanism:**
+
+- The project uses a **refresh token mechanism**. If the session expires, the browser automatically fetches a new access token using the refresh token, ensuring seamless access.
+
+### 🛠️ **Code Structure & API Handling:**
+
+- The code is modular and well-structured for maintainability.
+- Proper handling of APIs with error management.
