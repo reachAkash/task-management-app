@@ -115,21 +115,19 @@ module.exports = {
       user.otpExpiry = undefined;
       user.refreshToken = refreshToken;
       await user.save();
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        domain: ".vercel.app",
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        domain: ".vercel.app",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res
+        .cookie("accessToken", accessToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
       const {
         password,
@@ -177,7 +175,6 @@ module.exports = {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      domain: ".vercel.app",
       path: "/",
     });
 
@@ -185,7 +182,6 @@ module.exports = {
       httpOnly: true,
       secure: true,
       sameSite: "None",
-      domain: ".vercel.app",
       path: "/",
     });
     successResponse(res, 200, "Logged out successfully");

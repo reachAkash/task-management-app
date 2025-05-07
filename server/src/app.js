@@ -10,9 +10,9 @@ const taskRoutes = require("./routes/task.routes.js");
 const projectRoutes = require("./routes/project.routes.js");
 
 const allowedOrigins = [
-  "https://taskify-akash.vercel.app",
-  "https://task-management-app-git-feature-e9ef78-vaishnavakashs-projects.vercel.app",
-  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+  process.env.TESTING_URL,
+  process.env.CORS_ORIGIN,
 ];
 
 app.use(
