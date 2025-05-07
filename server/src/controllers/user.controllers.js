@@ -28,7 +28,6 @@ module.exports = {
         },
       });
 
-
       if (!user) {
         return errorResponse(res, 404, "User not found");
       }
@@ -116,19 +115,21 @@ module.exports = {
       user.otpExpiry = undefined;
       user.refreshToken = refreshToken;
       await user.save();
-      res
-        .cookie("accessToken", accessToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "None",
-          maxAge: 24 * 60 * 60 * 1000,
-        })
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "None",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        domain: ".vercel.app",
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        domain: ".vercel.app",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
       const {
         password,
@@ -172,8 +173,21 @@ module.exports = {
     }
   }),
   logoutUser: asyncHandler(async (req, res) => {
-    res.clearCookie("accessToken", { httpOnly: true, secure: true });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      domain: ".vercel.app",
+      path: "/",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      domain: ".vercel.app",
+      path: "/",
+    });
     successResponse(res, 200, "Logged out successfully");
   }),
 };
