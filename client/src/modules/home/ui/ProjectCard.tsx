@@ -21,6 +21,7 @@ import { deleteProjectRoute } from "@/axios/apiRoutes";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
+import { useState } from "react";
 
 interface ProjectCardProps {
   item: ProjectInterface;
@@ -28,8 +29,10 @@ interface ProjectCardProps {
 
 export const ProjectCard = ({ item }: ProjectCardProps) => {
   const { removeProject } = useProjectStore();
+  const [loading, setLoading] = useState(false);
 
   const handleDelete = async (id: string) => {
+    setLoading(true);
     try {
       const data = await axiosInstance.delete(`${deleteProjectRoute}/${id}`);
       toast.success(data.data.message);
@@ -39,6 +42,8 @@ export const ProjectCard = ({ item }: ProjectCardProps) => {
       toast.error(
         err.response?.data?.message || "Something went wrong. Please try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,8 +61,12 @@ export const ProjectCard = ({ item }: ProjectCardProps) => {
             <DropdownMenuTrigger>
               <Ellipsis className="size-5 text-muted-foreground cursor-pointer" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
+            <DropdownMenuContent
+              onClick={(e) => e.stopPropagation()}
+              align="start"
+            >
               <DropdownMenuItem
+                disabled={loading}
                 className="text-red-600"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent card click

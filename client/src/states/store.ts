@@ -74,3 +74,14 @@ export const useMemberStore = create<MemberStore>((set) => ({
   members: [],
   setMembers: (newMembers) => set({ members: newMembers }),
 }));
+
+// ---------------------- Loading STORE ----------------------
+interface LoadingStore {
+  loading: boolean; // better to type this
+  setLoading: (newLoading: boolean) => void;
+}
+
+export const useLoadingStore = create<LoadingStore>((set) => ({
+  loading: true,
+  setLoading: (newLoading) => set({ loading: newLoading }),
+}));

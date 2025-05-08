@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/axios/axiosInstance";
 import { getSingleUserRoute, refreshTokenRoute } from "@/axios/apiRoutes";
-import { useProjectStore, useUserStore } from "@/states/store";
+import { useLoadingStore, useProjectStore, useUserStore } from "@/states/store";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
@@ -8,9 +8,11 @@ import { useCallback } from "react";
 export const useFetchUserData = () => {
   const { setUser } = useUserStore();
   const { setProjects } = useProjectStore();
+  const { setLoading } = useLoadingStore();
   const router = useRouter();
 
   const refreshToken = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await axiosInstance.post(refreshTokenRoute);
       if (data.status == 200) {
@@ -20,10 +22,13 @@ export const useFetchUserData = () => {
       console.log(err);
       toast.error("Session expired! Please Log in.");
       router.push("/login");
+    } finally {
+      setLoading(false);
     }
   }, [router]);
 
   const getUserData = useCallback(async () => {
+    setLoading(true);
     try {
       const { data } = await axiosInstance.get(`${getSingleUserRoute}/`);
       const userData = data?.data;
@@ -36,6 +41,8 @@ export const useFetchUserData = () => {
       } else {
         console.error("Other error:", err);
       }
+    } finally {
+      setLoading(false);
     }
   }, [refreshToken]);
 
